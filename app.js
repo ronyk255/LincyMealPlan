@@ -335,7 +335,13 @@ document.addEventListener("click",event=>{
 
 $("#prevWeek").onclick=()=>{currentWeek=addDays(currentWeek,-7);renderWeek();}; $("#nextWeek").onclick=()=>{currentWeek=addDays(currentWeek,7);renderWeek();};
 $("#prevMonth").onclick=()=>{currentMonth=new Date(currentMonth.getFullYear(),currentMonth.getMonth()-1,1);renderMonth();}; $("#nextMonth").onclick=()=>{currentMonth=new Date(currentMonth.getFullYear(),currentMonth.getMonth()+1,1);renderMonth();};
-$("#todayButton").onclick=()=>{currentWeek=startOfWeek(new Date());currentMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);renderAll();};
+$("#todayButton").onclick=()=>{
+  const now=new Date();
+  currentWeek=startOfWeek(now); currentMonth=new Date(now.getFullYear(),now.getMonth(),1);
+  switchView("week"); renderWeek();
+  window.scrollTo({top:0,behavior:"smooth"});
+  showToast(`Showing this week · ${now.toLocaleDateString(undefined,{month:"short",day:"numeric"})}`);
+};
 $("#quickAddButton").onclick=()=>openMeal(); $("#generateButton").onclick=generateRecipe; $("#saveMeal").onclick=saveMeal; $("#mealVideo").addEventListener("change",updateVideoPreview);
 $("#mealDialog").addEventListener("click",event=>{if(event.target===$("#mealDialog"))closeMealDialog();});
 $("#deleteMeal").onclick=()=>{if(editingKey){delete state.meals[editingKey];save();$("#mealDialog").close();renderAll();showToast("Meal removed");}};
