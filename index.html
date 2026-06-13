@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="shopping.css">
   <link rel="manifest" href="manifest.webmanifest">
 </head>
 <body>
@@ -96,7 +97,7 @@
       </section>
 
       <section class="page hidden" id="shoppingView">
-        <div class="page-heading"><div><p class="eyebrow">ONE CALM TRIP</p><h1>Shopping list</h1><p class="subtitle" id="shoppingSubtitle">Everything your plan calls for, neatly combined.</p></div><div class="segmented"><button class="active" data-list-scope="week">This week</button><button data-list-scope="month">This month</button></div></div>
+        <div class="page-heading"><div><p class="eyebrow">ONE CALM TRIP</p><h1>Shopping list</h1><p class="subtitle" id="shoppingSubtitle">Everything your plan calls for, neatly combined.</p></div><div class="shopping-heading-actions"><div class="segmented"><button class="active" data-list-scope="week">This week</button><button data-list-scope="month">This month</button></div><button class="primary-button" id="addShoppingItem">＋ Add item</button></div></div>
         <div class="shopping-layout"><div class="shopping-main" id="fullShoppingList"></div><aside class="summary-card"><p class="eyebrow">AT A GLANCE</p><h2>Basket summary</h2><div id="basketSummary"></div><button class="primary-button full-width" id="copyList">Copy shopping list</button></aside></div>
       </section>
 
@@ -126,6 +127,18 @@
 
   <dialog class="settings-dialog" id="settingsDialog">
     <form method="dialog"><div class="dialog-head"><div><p class="eyebrow">MY KITCHEN</p><h2>Planning preferences</h2></div><button class="icon-button" value="cancel">×</button></div><div class="dialog-body"><label>Shopping region<select id="regionSelect"><option value="Sweden">Sweden</option><option value="United States">United States</option><option value="United Kingdom">United Kingdom</option><option value="Kenya">Kenya</option><option value="Nigeria">Nigeria</option><option value="India">India</option><option value="Other">Other</option></select></label><label>Measurement system<select id="unitSelect"><option value="metric">Metric (g, kg, ml)</option><option value="imperial">Imperial (oz, lb, cups)</option></select></label><p class="settings-note">Your region helps tailor ingredient wording and shopping suggestions. A future connected recipe service can also use it for live local availability and prices.</p></div><div class="dialog-actions"><span></span><button value="default" class="primary-button" id="saveSettings">Save preferences</button></div></form>
+  </dialog>
+
+  <dialog class="settings-dialog" id="shoppingItemDialog">
+    <form id="shoppingItemForm">
+      <div class="dialog-head"><div><p class="eyebrow">SHOPPING LIST</p><h2 id="shoppingItemTitle">Add an item</h2></div><button type="button" class="icon-button" id="closeShoppingItem" aria-label="Close">×</button></div>
+      <div class="dialog-body">
+        <label>Item name<input id="shoppingItemName" placeholder="e.g. sweet potatoes" required></label>
+        <div class="form-row"><label>Quantity<input id="shoppingItemQuantity" placeholder="2"></label><label>Unit<input id="shoppingItemUnit" placeholder="kg, packs, bunch"></label></div>
+        <label>Category<select id="shoppingItemCategory"><option>Fresh produce</option><option>Protein</option><option>Dairy & chilled</option><option>Bakery</option><option>Pantry</option><option>Other</option></select></label>
+      </div>
+      <div class="dialog-actions"><span></span><button type="button" class="secondary-button" id="cancelShoppingItem">Cancel</button><button type="button" class="primary-button" id="saveShoppingItem">Save item</button></div>
+    </form>
   </dialog>
 
   <div class="toast" id="toast"></div>

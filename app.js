@@ -34,13 +34,14 @@ function seedMeals() {
 
 let state;
 try { state = JSON.parse(localStorage.getItem(STORE_KEY)); } catch {}
-state = state || {meals:seedMeals(),settings:{region:"Sweden",units:"metric"},checked:{}};
-state.meals ||= {}; state.settings ||= {region:"Sweden",units:"metric"}; state.checked ||= {};
+state = state || {meals:seedMeals(),settings:{region:"Sweden",units:"metric"},checked:{},shoppingOverrides:{}};
+state.meals ||= {}; state.settings ||= {region:"Sweden",units:"metric"}; state.checked ||= {}; state.shoppingOverrides ||= {};
 let currentWeek = startOfWeek(new Date());
 let currentMonth = new Date(new Date().getFullYear(),new Date().getMonth(),1);
 let currentView = "week";
 let listScope = "week";
 let editingKey = null;
+let editingShoppingId = null;
 
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
@@ -106,6 +107,16 @@ function categoryFor(name) {
   return "Pantry";
 }
 
+function shoppingPeriodKey(scope=listScope) {
+  return scope==="week"?`week:${dateKey(currentWeek)}`:`month:${currentMonth.getFullYear()}-${pad(currentMonth.getMonth()+1)}`;
+}
+
+function shoppingOverrides(scope=listScope) {
+  const key=shoppingPeriodKey(scope);
+  state.shoppingOverrides[key] ||= {edits:{},deleted:{},manual:[]};
+  return state.shoppingOverrides[key];
+}
+
 function shoppingData(scope=listScope) {
   const start=scope==="week"?currentWeek:new Date(currentMonth.getFullYear(),currentMonth.getMonth(),1);
   const end=scope==="week"?addDays(currentWeek,6):new Date(currentMonth.getFullYear(),currentMonth.getMonth()+1,0);
@@ -122,6 +133,23 @@ function shoppingData(scope=listScope) {
     }
     if(!grouped[category][id].meals.includes(meal.name)) grouped[category][id].meals.push(meal.name);
   }));
+  const overrides=shoppingOverrides(scope);
+  Object.keys(grouped).forEach(category=>Object.keys(grouped[category]).forEach(id=>{
+    if(overrides.deleted[id]) { delete grouped[category][id]; return; }
+    const edit=overrides.edits[id];
+    if(!edit)return;
+    const item={...grouped[category][id],...edit,id};
+    delete grouped[category][id];
+    grouped[item.category] ||= {};
+    grouped[item.category][id]=item;
+  }));
+  overrides.manual.forEach(item=>{
+    if(overrides.deleted[item.id])return;
+    const merged={...item,...(overrides.edits[item.id]||{}),meals:["Manually added"]};
+    grouped[merged.category] ||= {};
+    grouped[merged.category][merged.id]=merged;
+  });
+  Object.keys(grouped).forEach(category=>{if(!Object.keys(grouped[category]).length)delete grouped[category];});
   return grouped;
 }
 
@@ -140,7 +168,7 @@ function renderSidebars() {
 function renderShopping() {
   const data=shoppingData(), groups=Object.entries(data), itemCount=groups.reduce((sum,[,group])=>sum+Object.keys(group).length,0);
   $("#shoppingSubtitle").textContent=`Combined for ${listScope==="week"?formatRange(currentWeek,addDays(currentWeek,6)):currentMonth.toLocaleDateString(undefined,{month:"long",year:"numeric"})} · ${state.settings.region}`;
-  $("#fullShoppingList").innerHTML=groups.length?groups.map(([category,group])=>`<section class="shopping-group"><h3>${category}</h3>${Object.values(group).map(item=>`<label class="shopping-row"><input type="checkbox" ${state.checked[item.id]?"checked":""} data-check="${escapeHtml(item.id)}"><span><strong>${escapeHtml(item.name)}</strong><small>For ${escapeHtml(item.meals.join(", "))}</small></span><span>${escapeHtml([item.quantity,item.unit].filter(Boolean).join(" "))}</span></label>`).join("")}</section>`).join(""):`<p class="subtitle">No ingredients yet. Add a meal and its ingredients will appear here.</p>`;
+  $("#fullShoppingList").innerHTML=groups.length?groups.map(([category,group])=>`<section class="shopping-group"><h3>${category}</h3>${Object.values(group).map(item=>`<div class="shopping-row"><input type="checkbox" ${state.checked[item.id]?"checked":""} data-check="${escapeHtml(item.id)}"><span><strong>${escapeHtml(item.name)}</strong><small>For ${escapeHtml(item.meals.join(", "))}</small></span><span class="shopping-quantity">${escapeHtml([item.quantity,item.unit].filter(Boolean).join(" "))}</span><span class="shopping-actions"><button type="button" data-edit-shopping="${encodeURIComponent(item.id)}">Edit</button><button type="button" class="delete-shopping" data-delete-shopping="${encodeURIComponent(item.id)}">Delete</button></span></div>`).join("")}</section>`).join(""):`<div class="empty-shopping"><p class="subtitle">No ingredients yet. Add a meal or add a shopping item manually.</p><button class="primary-button" data-add-shopping>＋ Add first item</button></div>`;
   const checked=Object.values(data).flatMap(g=>Object.values(g)).filter(item=>state.checked[item.id]).length;
   $("#basketSummary").innerHTML=`<div class="basket-stat"><span>Unique items</span><strong>${itemCount}</strong></div><div class="basket-stat"><span>Categories</span><strong>${groups.length}</strong></div><div class="basket-stat"><span>Already checked</span><strong>${checked}</strong></div><div class="basket-stat"><span>Shopping region</span><strong>${escapeHtml(state.settings.region)}</strong></div>`;
 }
@@ -187,9 +215,13 @@ function closeMealDialog() {
 
 function generateRecipe() {
   const name=$("#mealName").value.trim(); if(!name){showToast("Enter a meal idea first");return;}
-  const recipe=recipeLibrary.find(item=>item.match.some(term=>name.toLowerCase().includes(term)))||defaultRecipe(name);
+  const recipe=recipeFor(name);
   $("#mealDescription").value=recipe.description; $("#mealTime").value=recipe.time; $("#mealIngredients").value=recipe.ingredients.join("\n"); $("#mealRecipe").value=recipe.steps.join("\n"); $("#mealVideo").value=recipe.video;
   updateVideoPreview(); showToast(`Recipe prepared for ${state.settings.region}`);
+}
+
+function recipeFor(name) {
+  return recipeLibrary.find(item=>item.match.some(term=>name.toLowerCase().includes(term)))||defaultRecipe(name);
 }
 
 function updateVideoPreview() {
@@ -200,9 +232,47 @@ function updateVideoPreview() {
 function saveMeal(event) {
   event.preventDefault();
   if(!$("#mealForm").reportValidity())return;
-  const date=$("#mealDate").value,type=$("#mealType").value,newKey=mealKey(date,type);
-  const meal={date,type,name:$("#mealName").value.trim(),description:$("#mealDescription").value.trim(),servings:Number($("#mealServings").value)||4,time:$("#mealTime").value.trim(),ingredients:$("#mealIngredients").value.split("\n").map(v=>v.trim()).filter(Boolean),steps:$("#mealRecipe").value.split("\n").map(v=>v.trim()).filter(Boolean),video:$("#mealVideo").value.trim()};
+  const date=$("#mealDate").value,type=$("#mealType").value,newKey=mealKey(date,type),name=$("#mealName").value.trim();
+  if(!$("#mealIngredients").value.trim()) {
+    const generated=recipeFor(name);
+    $("#mealDescription").value ||= generated.description; $("#mealTime").value ||= generated.time;
+    $("#mealIngredients").value=generated.ingredients.join("\n"); $("#mealRecipe").value ||= generated.steps.join("\n"); $("#mealVideo").value ||= generated.video;
+  }
+  const meal={date,type,name,description:$("#mealDescription").value.trim(),servings:Number($("#mealServings").value)||4,time:$("#mealTime").value.trim(),ingredients:$("#mealIngredients").value.split("\n").map(v=>v.trim()).filter(Boolean),steps:$("#mealRecipe").value.split("\n").map(v=>v.trim()).filter(Boolean),video:$("#mealVideo").value.trim()};
   if(editingKey&&editingKey!==newKey)delete state.meals[editingKey]; state.meals[newKey]=meal; save(); $("#mealDialog").close(); renderAll(); showToast("Meal saved to your plan");
+}
+
+function findShoppingItem(id) {
+  return Object.values(shoppingData()).flatMap(group=>Object.values(group)).find(item=>item.id===id);
+}
+
+function closeShoppingItemDialog() {
+  editingShoppingId=null;
+  $("#shoppingItemDialog").close();
+}
+
+function openShoppingItem(id=null) {
+  editingShoppingId=id;
+  const item=id?findShoppingItem(id):null;
+  $("#shoppingItemTitle").textContent=item?"Edit shopping item":"Add an item";
+  $("#shoppingItemName").value=item?.name||""; $("#shoppingItemQuantity").value=item?.quantity||"";
+  $("#shoppingItemUnit").value=item?.unit||""; $("#shoppingItemCategory").value=item?.category||"Fresh produce";
+  $("#shoppingItemDialog").showModal(); setTimeout(()=>$("#shoppingItemName").focus(),50);
+}
+
+function saveShoppingItem() {
+  if(!$("#shoppingItemForm").reportValidity())return;
+  const overrides=shoppingOverrides(),wasEditing=Boolean(editingShoppingId);
+  const values={name:$("#shoppingItemName").value.trim(),quantity:$("#shoppingItemQuantity").value.trim(),unit:$("#shoppingItemUnit").value.trim(),category:$("#shoppingItemCategory").value};
+  if(wasEditing) overrides.edits[editingShoppingId]=values;
+  else overrides.manual.push({id:`manual:${Date.now()}:${Math.random().toString(36).slice(2,7)}`,...values});
+  save(); closeShoppingItemDialog(); renderShopping(); renderSidebars(); showToast(wasEditing?"Shopping item updated":"Shopping item added");
+}
+
+function deleteShoppingItem(id) {
+  const overrides=shoppingOverrides();
+  overrides.deleted[id]=true; delete overrides.edits[id]; delete state.checked[id];
+  save(); renderShopping(); renderSidebars(); showToast("Shopping item deleted");
 }
 
 function renderAll(){renderWeek();if(currentView==="month")renderMonth();if(currentView==="shopping")renderShopping();if(currentView==="insights")renderInsights();}
@@ -214,6 +284,9 @@ document.addEventListener("click",event=>{
   const openView=event.target.closest("[data-open-view]"); if(openView)switchView(openView.dataset.openView);
   const scope=event.target.closest("[data-list-scope]"); if(scope){listScope=scope.dataset.listScope;$$(`[data-list-scope]`).forEach(b=>b.classList.toggle("active",b===scope));renderShopping();}
   const check=event.target.closest("[data-check]"); if(check){state.checked[check.dataset.check]=check.checked;save();if(currentView==="shopping")renderShopping();}
+  const editShopping=event.target.closest("[data-edit-shopping]"); if(editShopping)openShoppingItem(decodeURIComponent(editShopping.dataset.editShopping));
+  const deleteShopping=event.target.closest("[data-delete-shopping]"); if(deleteShopping)deleteShoppingItem(decodeURIComponent(deleteShopping.dataset.deleteShopping));
+  if(event.target.closest("[data-add-shopping]"))openShoppingItem();
 });
 
 $("#prevWeek").onclick=()=>{currentWeek=addDays(currentWeek,-7);renderWeek();}; $("#nextWeek").onclick=()=>{currentWeek=addDays(currentWeek,7);renderWeek();};
@@ -227,6 +300,10 @@ $("#menuButton").onclick=()=>$("#sidebar").classList.toggle("open");
 $("#profileButton").onclick=()=>{$("#regionSelect").value=state.settings.region;$("#unitSelect").value=state.settings.units;$("#settingsDialog").showModal();};
 $("#saveSettings").onclick=()=>{state.settings={region:$("#regionSelect").value,units:$("#unitSelect").value};save();renderSettings();showToast("Kitchen preferences saved");};
 $("#copyList").onclick=async()=>{const data=shoppingData(),text=Object.entries(data).map(([category,group])=>`${category}\n${Object.values(group).map(item=>`- ${[item.quantity,item.unit,item.name].filter(Boolean).join(" ")}`).join("\n")}`).join("\n\n");try{await navigator.clipboard.writeText(text);showToast("Shopping list copied");}catch{showToast("Copy is unavailable in this browser");}};
+$("#addShoppingItem").onclick=()=>openShoppingItem(); $("#saveShoppingItem").onclick=saveShoppingItem;
+$("#shoppingItemForm").addEventListener("submit",event=>{event.preventDefault();saveShoppingItem();});
+$("#closeShoppingItem").onclick=closeShoppingItemDialog; $("#cancelShoppingItem").onclick=closeShoppingItemDialog;
+$("#shoppingItemDialog").addEventListener("click",event=>{if(event.target===$("#shoppingItemDialog"))closeShoppingItemDialog();});
 $("#globalSearch").addEventListener("input",event=>{const q=event.target.value.trim().toLowerCase();if(!q){renderAll();return;}const matches=Object.entries(state.meals).filter(([,meal])=>meal.name.toLowerCase().includes(q)||meal.ingredients.some(i=>i.toLowerCase().includes(q)));if(currentView!=="week")switchView("week");$$('.meal-slot.filled').forEach(slot=>slot.style.opacity=".25");matches.forEach(([key])=>{const button=document.querySelector(`[data-edit="${key}"]`);if(button)button.closest(".meal-slot").style.opacity="1";});});
 document.addEventListener("keydown",event=>{if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==="k"){event.preventDefault();$("#globalSearch").focus();}});
 
