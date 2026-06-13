@@ -62,10 +62,13 @@
             <h1>What’s cooking?</h1>
             <p class="subtitle">A little planning now, a lot more ease later.</p>
           </div>
-          <div class="date-nav">
-            <button class="icon-button" id="prevWeek" aria-label="Previous week">←</button>
-            <button class="date-range" id="weekRange"></button>
-            <button class="icon-button" id="nextWeek" aria-label="Next week">→</button>
+          <div class="plan-heading-actions">
+            <div class="date-nav">
+              <button class="icon-button" id="prevWeek" aria-label="Previous week">←</button>
+              <button class="date-range" id="weekRange"></button>
+              <button class="icon-button" id="nextWeek" aria-label="Next week">→</button>
+            </div>
+            <button class="clear-plan-button" data-open-clear-plan="week">Clear meals</button>
           </div>
         </div>
 
@@ -91,7 +94,7 @@
       <section class="page hidden" id="monthView">
         <div class="page-heading">
           <div><p class="eyebrow">THE BIG PICTURE</p><h1>Monthly menu</h1><p class="subtitle">See your food rhythm across the whole month.</p></div>
-          <div class="date-nav"><button class="icon-button" id="prevMonth">←</button><button class="date-range" id="monthRange"></button><button class="icon-button" id="nextMonth">→</button></div>
+          <div class="plan-heading-actions"><div class="date-nav"><button class="icon-button" id="prevMonth">←</button><button class="date-range" id="monthRange"></button><button class="icon-button" id="nextMonth">→</button></div><button class="clear-plan-button" data-open-clear-plan="month">Clear meals</button></div>
         </div>
         <div class="month-card"><div class="month-weekdays"><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span></div><div class="month-grid" id="monthGrid"></div></div>
       </section>
@@ -139,6 +142,17 @@
       </div>
       <div class="dialog-actions"><span></span><button type="button" class="secondary-button" id="cancelShoppingItem">Cancel</button><button type="button" class="primary-button" id="saveShoppingItem">Save item</button></div>
     </form>
+  </dialog>
+
+  <dialog class="settings-dialog clear-plan-dialog" id="clearPlanDialog">
+    <div class="dialog-head"><div><p class="eyebrow">CLEAR YOUR PLAN</p><h2>Which meals should go?</h2></div><button type="button" class="icon-button" id="closeClearPlan" aria-label="Close">×</button></div>
+    <div class="dialog-body">
+      <p class="clear-plan-note" id="clearPlanNote">Choose a date range. This cannot be undone.</p>
+      <button type="button" class="clear-choice" data-clear-scope="week"><span><strong>Delete visible week</strong><small id="clearWeekDates"></small></span><b id="clearWeekCount">0 meals</b></button>
+      <button type="button" class="clear-choice" data-clear-scope="month"><span><strong>Delete visible month</strong><small id="clearMonthDates"></small></span><b id="clearMonthCount">0 meals</b></button>
+      <button type="button" class="clear-choice clear-everything" data-clear-scope="all"><span><strong>Delete all meals</strong><small>Clear the entire weekly and monthly plan</small></span><b id="clearAllCount">0 meals</b></button>
+    </div>
+    <div class="dialog-actions"><span></span><button type="button" class="secondary-button" id="cancelClearPlan">Cancel</button></div>
   </dialog>
 
   <div class="toast" id="toast"></div>

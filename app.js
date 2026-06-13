@@ -42,6 +42,7 @@ let currentView = "week";
 let listScope = "week";
 let editingKey = null;
 let editingShoppingId = null;
+let clearPlanContext = "week";
 
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
@@ -275,6 +276,47 @@ function deleteShoppingItem(id) {
   save(); renderShopping(); renderSidebars(); showToast("Shopping item deleted");
 }
 
+function clearPlanRanges() {
+  const monthReference=clearPlanContext==="week"?addDays(currentWeek,3):currentMonth;
+  const monthStart=new Date(monthReference.getFullYear(),monthReference.getMonth(),1);
+  return {
+    week:[currentWeek,addDays(currentWeek,6)],
+    month:[monthStart,new Date(monthStart.getFullYear(),monthStart.getMonth()+1,0)]
+  };
+}
+
+function closeClearPlan() {
+  $("#clearPlanDialog").close();
+}
+
+function openClearPlan(context) {
+  clearPlanContext=context;
+  const ranges=clearPlanRanges();
+  const weekMeals=mealsInRange(...ranges.week),monthMeals=mealsInRange(...ranges.month),allMeals=Object.values(state.meals);
+  $("#clearPlanNote").textContent=`Choose what to remove from the ${context} view. This cannot be undone.`;
+  $("[data-clear-scope=\"week\"]").classList.toggle("hidden",context==="month");
+  $("#clearWeekDates").textContent=formatRange(...ranges.week);
+  $("#clearMonthDates").textContent=ranges.month[0].toLocaleDateString(undefined,{month:"long",year:"numeric"});
+  [["week",weekMeals.length],["month",monthMeals.length],["all",allMeals.length]].forEach(([scope,count])=>{
+    $(`#clear${scope[0].toUpperCase()+scope.slice(1)}Count`).textContent=`${count} ${count===1?"meal":"meals"}`;
+    $(`[data-clear-scope="${scope}"]`).disabled=count===0;
+  });
+  $("#clearPlanDialog").showModal();
+}
+
+function deleteMealsByScope(scope) {
+  const ranges=clearPlanRanges();
+  let keys=[];
+  if(scope==="all") keys=Object.keys(state.meals);
+  else {
+    const [start,end]=ranges[scope];
+    keys=Object.entries(state.meals).filter(([,meal])=>{const date=parseDate(meal.date);return date>=start&&date<=end;}).map(([key])=>key);
+  }
+  keys.forEach(key=>delete state.meals[key]);
+  save(); closeClearPlan(); renderAll();
+  showToast(`${keys.length} ${keys.length===1?"meal":"meals"} deleted`);
+}
+
 function renderAll(){renderWeek();if(currentView==="month")renderMonth();if(currentView==="shopping")renderShopping();if(currentView==="insights")renderInsights();}
 
 document.addEventListener("click",event=>{
@@ -287,6 +329,8 @@ document.addEventListener("click",event=>{
   const editShopping=event.target.closest("[data-edit-shopping]"); if(editShopping)openShoppingItem(decodeURIComponent(editShopping.dataset.editShopping));
   const deleteShopping=event.target.closest("[data-delete-shopping]"); if(deleteShopping)deleteShoppingItem(decodeURIComponent(deleteShopping.dataset.deleteShopping));
   if(event.target.closest("[data-add-shopping]"))openShoppingItem();
+  const openClear=event.target.closest("[data-open-clear-plan]"); if(openClear)openClearPlan(openClear.dataset.openClearPlan);
+  const clearScope=event.target.closest("[data-clear-scope]"); if(clearScope&&!clearScope.disabled)deleteMealsByScope(clearScope.dataset.clearScope);
 });
 
 $("#prevWeek").onclick=()=>{currentWeek=addDays(currentWeek,-7);renderWeek();}; $("#nextWeek").onclick=()=>{currentWeek=addDays(currentWeek,7);renderWeek();};
@@ -304,6 +348,8 @@ $("#addShoppingItem").onclick=()=>openShoppingItem(); $("#saveShoppingItem").onc
 $("#shoppingItemForm").addEventListener("submit",event=>{event.preventDefault();saveShoppingItem();});
 $("#closeShoppingItem").onclick=closeShoppingItemDialog; $("#cancelShoppingItem").onclick=closeShoppingItemDialog;
 $("#shoppingItemDialog").addEventListener("click",event=>{if(event.target===$("#shoppingItemDialog"))closeShoppingItemDialog();});
+$("#closeClearPlan").onclick=closeClearPlan; $("#cancelClearPlan").onclick=closeClearPlan;
+$("#clearPlanDialog").addEventListener("click",event=>{if(event.target===$("#clearPlanDialog"))closeClearPlan();});
 $("#globalSearch").addEventListener("input",event=>{const q=event.target.value.trim().toLowerCase();if(!q){renderAll();return;}const matches=Object.entries(state.meals).filter(([,meal])=>meal.name.toLowerCase().includes(q)||meal.ingredients.some(i=>i.toLowerCase().includes(q)));if(currentView!=="week")switchView("week");$$('.meal-slot.filled').forEach(slot=>slot.style.opacity=".25");matches.forEach(([key])=>{const button=document.querySelector(`[data-edit="${key}"]`);if(button)button.closest(".meal-slot").style.opacity="1";});});
 document.addEventListener("keydown",event=>{if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==="k"){event.preventDefault();$("#globalSearch").focus();}});
 
