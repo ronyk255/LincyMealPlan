@@ -18,7 +18,99 @@ const recipeLibrary = [
   {match:["salad","bowl"],description:"A crisp, satisfying bowl layered with grains, vegetables and a fresh dressing.",time:"25 min",ingredients:["250 g quinoa","1 cucumber","250 g cherry tomatoes","1 can chickpeas","1 avocado","100 g feta","1 lemon","2 tbsp olive oil","1 bag mixed leaves"],steps:["Cook quinoa according to the packet and cool slightly.","Drain chickpeas and chop the vegetables.","Whisk lemon juice and olive oil with salt and pepper.","Layer leaves, quinoa, chickpeas and vegetables.","Crumble over feta and spoon on the dressing."],video:"https://www.youtube.com/watch?v=9dbpVyiGxT8"}
 ];
 
-const defaultRecipe = name => ({description:`A simple, adaptable ${name.toLowerCase()} made with everyday ingredients.`,time:"35 min",ingredients:[`500 g main ingredient for ${name}`,"1 onion","2 garlic cloves","2 tbsp cooking oil","500 g seasonal vegetables","1 tsp preferred seasoning","1 fresh herb or garnish","1 pantry staple to serve"],steps:["Prepare and chop all ingredients.","Warm the oil and cook the onion until soft.",`Add the main ingredients for ${name} and cook until well coloured.`,"Add seasoning and a splash of water; simmer until cooked through.","Taste, adjust seasoning and serve with your chosen garnish."],video:`https://www.youtube.com/results?search_query=${encodeURIComponent(name + " recipe")}`});
+const detailedRecipeSteps = [
+  {match:["curry","tikka","masala"],steps:[
+    "Prepare everything first: cut the chicken thighs into 3 cm pieces, finely dice the onion, mince the garlic, grate the ginger, chop the coriander, and cut the lime into wedges.",
+    "Rinse the basmati rice under cold water until the water runs mostly clear. Add it to a saucepan with 600 ml water and a pinch of salt, bring to a boil, then cover and cook on very low heat for 12 minutes.",
+    "Pat the chicken dry and season it with salt and black pepper. Heat 1 tablespoon of oil in a large deep frying pan over medium-high heat.",
+    "Add the chicken in a single layer and brown it for 4-5 minutes, turning occasionally. It does not need to be cooked through yet. Transfer it to a plate.",
+    "Lower the heat to medium. Add the onion to the same pan with a small pinch of salt and cook for 5-7 minutes, stirring, until soft and lightly golden.",
+    "Add the garlic and ginger and cook for 1 minute. Stir in the curry powder and cook for another 30 seconds until fragrant, taking care not to burn the spices.",
+    "Pour in the chopped tomatoes and coconut milk. Scrape the bottom of the pan to release the browned flavour, then bring the sauce to a gentle simmer.",
+    "Return the chicken and any resting juices to the pan. Simmer uncovered for 15-20 minutes, stirring occasionally, until the chicken is cooked through and the sauce has thickened. Chicken should reach 75°C in the centre.",
+    "Turn off the rice and let it rest, still covered, for 5 minutes before fluffing it with a fork. If the curry is too thick, loosen it with a splash of water.",
+    "Taste the curry and adjust with salt, black pepper, and lime juice. Spoon over the rice and finish with fresh coriander and the remaining lime wedges."
+  ]},
+  {match:["pasta","spaghetti","bolognese","lasagne"],steps:[
+    "Bring a large pot of water to a rolling boil. Finely dice the onion, mince the garlic, grate the parmesan, and wash the salad leaves.",
+    "Heat a large frying pan over medium-high heat. Add the minced beef and cook for 6-8 minutes, breaking it into small pieces, until browned and no pink remains.",
+    "If the pan contains excess fat, carefully spoon most of it away. Add the onion and cook for 4-5 minutes until softened.",
+    "Add the garlic and cook for 30 seconds. Stir in the tomato paste and oregano and cook for 1 minute to deepen their flavour.",
+    "Pour in the chopped tomatoes plus 150 ml water. Scrape up any browned bits, bring to a simmer, then lower the heat and cook uncovered for 15-20 minutes.",
+    "Salt the boiling pasta water generously. Add the pasta and cook until al dente according to the packet, stirring during the first minute so it does not stick.",
+    "Before draining, reserve about 200 ml of pasta water. Drain the pasta without rinsing it.",
+    "Taste the sauce and season with salt and pepper. Add the pasta and a splash of reserved water, then toss over low heat for 1-2 minutes until the sauce coats every strand.",
+    "Divide between warm bowls, add parmesan, and serve immediately with the green salad dressed simply with oil, vinegar, salt, and pepper."
+  ]},
+  {match:["salmon","fish"],steps:[
+    "Heat the oven to 210°C conventional or 190°C fan. Line a large tray with baking paper.",
+    "Halve the baby potatoes, place them on the tray, and toss with 1 tablespoon olive oil, salt, and black pepper. Arrange cut-side down.",
+    "Roast the potatoes for 15 minutes. Meanwhile, cut the broccoli into florets, zest half the lemon, and cut the whole lemon into wedges.",
+    "Pat the salmon dry and check for pin bones. Season both sides with salt and pepper and rub the top with lemon zest and a little olive oil.",
+    "Remove the tray, turn the potatoes, and add the broccoli tossed with the remaining oil and a pinch of salt. Make space for the salmon fillets.",
+    "Place the salmon skin-side down and return the tray to the oven for 12-15 minutes, depending on thickness.",
+    "While it roasts, mix the yoghurt with minced garlic, chopped dill, a squeeze of lemon, salt, and pepper. Keep chilled until serving.",
+    "Check the salmon: it should flake easily but remain moist in the centre, or register about 52-55°C for medium and 63°C for fully cooked.",
+    "Rest the salmon for 2 minutes, then serve with the roasted potatoes, broccoli, dill yoghurt sauce, and lemon wedges."
+  ]},
+  {match:["taco","burrito","quesadilla"],steps:[
+    "Prepare the toppings first: shred the lettuce, dice the tomatoes, grate the cheese, cut the lime into wedges, and slice the avocado just before serving.",
+    "Drain and rinse the black beans. Warm them in a small saucepan over low heat with 2 tablespoons of water and a pinch of salt.",
+    "Heat a large frying pan over medium-high heat. Add the minced beef and cook for 6-8 minutes, breaking it up, until deeply browned and cooked through.",
+    "Spoon away excess fat if needed. Add the taco seasoning and the amount of water stated on the packet, usually about 100 ml.",
+    "Reduce the heat and simmer the beef for 4-5 minutes until the liquid has reduced and the meat is evenly coated. Taste and adjust the salt.",
+    "Warm the tortillas in a dry pan for 20-30 seconds per side, or wrap them in foil and heat in a low oven. Keep them covered so they stay soft.",
+    "Season the avocado with a squeeze of lime and a small pinch of salt to prevent browning.",
+    "Arrange the beef, beans, vegetables, cheese, sour cream, avocado, and lime in separate bowls so everyone can assemble their own tacos.",
+    "Fill each warm tortilla lightly so it can fold: start with beef and beans, then add fresh toppings, cheese, sour cream, and lime. Serve immediately."
+  ]},
+  {match:["soup","stew"],steps:[
+    "Prepare the vegetables: dice the onion, slice the carrots and celery, cut the potatoes into 2 cm pieces, and mince the garlic. Drain and rinse the beans.",
+    "Heat 2 tablespoons of oil in a large heavy pot over medium heat. Add the onion, carrots, and celery with a pinch of salt.",
+    "Cook for 8-10 minutes, stirring occasionally, until the vegetables soften and the onion becomes translucent without browning.",
+    "Add the garlic and thyme and cook for 1 minute until fragrant.",
+    "Add the potatoes and vegetable stock. Increase the heat and bring the soup to a boil, then reduce it to a steady gentle simmer.",
+    "Partially cover and simmer for 20-25 minutes, stirring occasionally, until the potatoes and carrots are tender when pierced with a knife.",
+    "Stir in the white beans and simmer uncovered for another 5 minutes so they heat through and absorb the flavour.",
+    "For a thicker soup, mash a few potato and bean pieces against the side of the pot, then stir them back in.",
+    "Taste carefully and adjust with salt and black pepper. Add a splash of water or stock if the soup has become too thick.",
+    "Let the soup rest for 5 minutes, then ladle into bowls and serve with thick slices of warm crusty bread."
+  ]},
+  {match:["pancake","waffle"],steps:[
+    "Heat the oven to 100°C and place a tray inside so finished pancakes can stay warm without drying out.",
+    "In a large bowl, whisk together the flour, baking powder, and a small pinch of salt, breaking up any lumps.",
+    "In a separate jug, whisk the eggs and milk. Melt the butter and allow it to cool for a minute before whisking it into the wet mixture.",
+    "Make a well in the flour and pour in the wet ingredients. Fold gently until no dry flour remains; a few small lumps are better than overmixing.",
+    "Leave the batter to rest for 5 minutes. This hydrates the flour and helps the pancakes rise evenly.",
+    "Heat a non-stick frying pan over medium heat and brush it with a thin film of butter. The pan is ready when a drop of water sizzles gently.",
+    "Add about 60 ml batter per pancake. Cook for 2-3 minutes until bubbles form across the surface and the edges look set.",
+    "Flip once and cook for another 1-2 minutes until golden underneath and springy in the centre. Adjust the heat if they brown too quickly.",
+    "Transfer each batch to the warm oven. Serve stacked with yoghurt, berries, nuts if desired, and maple syrup."
+  ]},
+  {match:["oat","porridge","granola"],steps:[
+    "Measure the oats and milk into a medium saucepan. Add a small pinch of salt and half of the cinnamon.",
+    "Peel one banana and mash it thoroughly with a fork, then stir it into the oats for natural sweetness and a creamy texture.",
+    "Place the saucepan over medium heat and bring it just to a gentle simmer, stirring frequently so the milk does not catch on the bottom.",
+    "Lower the heat and cook for 5-7 minutes, stirring every 30 seconds, until the oats are tender and the porridge is thick but still spoonable.",
+    "If it becomes too thick, stir in a little more milk. For thicker porridge, cook for another minute.",
+    "Taste and add the remaining cinnamon or a little honey if more sweetness is needed.",
+    "Slice the second banana and roughly chop the nuts. If using frozen berries, warm them briefly until juicy.",
+    "Divide the porridge between bowls and top with banana, berries, nuts, and a drizzle of honey. Serve immediately while hot."
+  ]},
+  {match:["salad","bowl"],steps:[
+    "Rinse the quinoa very well in a fine sieve. Add it to a saucepan with 500 ml water and a pinch of salt.",
+    "Bring to a boil, cover, reduce to very low heat, and cook for 12-15 minutes until the water is absorbed and the grains have opened.",
+    "Remove the quinoa from the heat and let it stand covered for 5 minutes. Fluff with a fork, spread on a plate, and cool slightly.",
+    "Drain and rinse the chickpeas, then pat them dry. Dice the cucumber, halve the cherry tomatoes, slice the avocado, and crumble the feta.",
+    "Make the dressing by whisking the lemon juice and olive oil with a generous pinch of salt and black pepper until lightly emulsified.",
+    "Place the mixed leaves in a large bowl and toss them with one-third of the dressing.",
+    "Add the quinoa, chickpeas, cucumber, and tomatoes. Pour over most of the remaining dressing and toss gently so the avocado will not break up later.",
+    "Divide into bowls, then arrange the avocado and feta over the top.",
+    "Taste and finish with the remaining dressing, extra lemon, salt, or pepper as needed. Serve at room temperature."
+  ]}
+];
+
+const defaultRecipe = name => ({description:`A simple, adaptable ${name.toLowerCase()} made with everyday ingredients.`,time:"35 min",ingredients:[`500 g main ingredient for ${name}`,"1 onion","2 garlic cloves","2 tbsp cooking oil","500 g seasonal vegetables","1 tsp preferred seasoning","1 fresh herb or garnish","1 pantry staple to serve"],steps:["Read the full recipe, gather all ingredients, and set out the equipment you will need before turning on the heat.","Wash the produce, finely dice the onion, mince the garlic, cut the seasonal vegetables into even bite-sized pieces, and prepare the main ingredient so everything cooks at the same rate.","Pat the main ingredient dry and season it on all sides with salt, black pepper, and half of the preferred seasoning.","Heat 1 tablespoon of oil in a wide pan over medium-high heat. Add the main ingredient in a single layer and cook until well browned, turning as needed. Transfer it to a clean plate if it needs further cooking later.","Reduce the heat to medium, add the remaining oil and onion, and cook for 5-7 minutes until soft. Add the garlic and remaining seasoning and stir for 30-60 seconds until fragrant.","Add the seasonal vegetables, starting with the firmest pieces. Cook for 5 minutes, stirring occasionally, then add a splash of water or stock and scrape up the flavour from the bottom of the pan.",`Return the main ingredient for ${name} to the pan. Cover loosely and cook at a gentle simmer until the vegetables are tender and the main ingredient is safely cooked through; poultry should reach 75°C and minced meat 71°C.`,"Remove the lid for the final few minutes if the dish needs to reduce. Taste and adjust the salt, pepper, acidity, and seasoning until the flavour is balanced.","Let the finished dish rest off the heat for 3-5 minutes. Prepare the chosen pantry staple according to its packet while the main dish rests.","Serve in warm bowls or plates, spoon over any pan juices, and finish with the fresh herb or garnish."],video:`https://www.youtube.com/results?search_query=${encodeURIComponent(name + " recipe")}`});
 
 function seedMeals() {
   const monday = startOfWeek(new Date());
@@ -219,6 +311,12 @@ function closeRecipeDetail() {
 function renderRecipeDetail() {
   const meal=state.meals[viewingMealKey];
   if(!meal){closeRecipeDetail();return;}
+  const legacyRecipe=recipeLibrary.find(item=>item.match.some(term=>meal.name.toLowerCase().includes(term)));
+  if(legacyRecipe&&JSON.stringify(meal.steps||[])===JSON.stringify(legacyRecipe.steps)) {
+    meal.steps=recipeFor(meal.name).steps;
+    state.recipeChecks[viewingMealKey]={};
+    save();
+  }
   const date=parseDate(meal.date),fallbackVideo=recipeFor(meal.name).video,videoId=youtubeVideoId(meal.video)||youtubeVideoId(fallbackVideo);
   $("#detailEyebrow").textContent=`${meal.type} · ${date.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"})}`;
   $("#detailMealName").textContent=meal.name;
@@ -273,7 +371,10 @@ function generateRecipe() {
 }
 
 function recipeFor(name) {
-  return recipeLibrary.find(item=>item.match.some(term=>name.toLowerCase().includes(term)))||defaultRecipe(name);
+  const base=recipeLibrary.find(item=>item.match.some(term=>name.toLowerCase().includes(term)));
+  if(!base)return defaultRecipe(name);
+  const detailed=detailedRecipeSteps.find(item=>item.match.some(term=>name.toLowerCase().includes(term)));
+  return {...base,steps:detailed?.steps||base.steps};
 }
 
 function updateVideoPreview() {
