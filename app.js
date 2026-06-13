@@ -180,6 +180,11 @@ function openMeal(date=dateKey(new Date()),type="Dinner",key=null) {
   $("#deleteMeal").classList.toggle("hidden",!meal); updateVideoPreview(); $("#mealDialog").showModal(); setTimeout(()=>$("#mealName").focus(),50);
 }
 
+function closeMealDialog() {
+  editingKey=null;
+  $("#mealDialog").close();
+}
+
 function generateRecipe() {
   const name=$("#mealName").value.trim(); if(!name){showToast("Enter a meal idea first");return;}
   const recipe=recipeLibrary.find(item=>item.match.some(term=>name.toLowerCase().includes(term)))||defaultRecipe(name);
@@ -215,6 +220,8 @@ $("#prevWeek").onclick=()=>{currentWeek=addDays(currentWeek,-7);renderWeek();}; 
 $("#prevMonth").onclick=()=>{currentMonth=new Date(currentMonth.getFullYear(),currentMonth.getMonth()-1,1);renderMonth();}; $("#nextMonth").onclick=()=>{currentMonth=new Date(currentMonth.getFullYear(),currentMonth.getMonth()+1,1);renderMonth();};
 $("#todayButton").onclick=()=>{currentWeek=startOfWeek(new Date());currentMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);renderAll();};
 $("#quickAddButton").onclick=()=>openMeal(); $("#generateButton").onclick=generateRecipe; $("#saveMeal").onclick=saveMeal; $("#mealVideo").addEventListener("change",updateVideoPreview);
+$("#closeMealDialog").onclick=closeMealDialog; $("#cancelMealDialog").onclick=closeMealDialog;
+$("#mealDialog").addEventListener("click",event=>{if(event.target===$("#mealDialog"))closeMealDialog();});
 $("#deleteMeal").onclick=()=>{if(editingKey){delete state.meals[editingKey];save();$("#mealDialog").close();renderAll();showToast("Meal removed");}};
 $("#menuButton").onclick=()=>$("#sidebar").classList.toggle("open");
 $("#profileButton").onclick=()=>{$("#regionSelect").value=state.settings.region;$("#unitSelect").value=state.settings.units;$("#settingsDialog").showModal();};
