@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#173f35">
+  <meta name="description" content="Lincy meal planning, recipes and smart shopping lists.">
+  <title>Lincy | Plan food, live well</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.webmanifest">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#" aria-label="Lincy home">
+        <span class="brand-mark">L</span>
+        <span><strong>Lincy</strong><small>meal planner</small></span>
+      </a>
+
+      <nav class="main-nav" aria-label="Main navigation">
+        <button class="nav-item active" data-view="week"><span>▦</span> Weekly plan</button>
+        <button class="nav-item" data-view="month"><span>□</span> Monthly view</button>
+        <button class="nav-item" data-view="shopping"><span>⌑</span> Shopping list <b id="shoppingBadge">0</b></button>
+        <button class="nav-item" data-view="insights"><span>↗</span> Meal insights</button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="season-card">
+          <span class="season-icon">☀</span>
+          <div><small>Seasonal note</small><strong id="seasonTip">Fresh summer produce is in.</strong></div>
+        </div>
+        <button class="profile" id="profileButton">
+          <span class="avatar">LM</span>
+          <span><strong>My kitchen</strong><small id="profileRegion">Sweden · metric</small></span>
+          <span>···</span>
+        </button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <button class="icon-button menu-button" id="menuButton" aria-label="Open menu">☰</button>
+        <div class="search-wrap">
+          <span>⌕</span>
+          <input id="globalSearch" type="search" placeholder="Search your meals and recipes...">
+          <kbd>⌘ K</kbd>
+        </div>
+        <div class="top-actions">
+          <button class="icon-button" id="todayButton" title="Go to today">◎</button>
+          <button class="primary-button" id="quickAddButton"><span>＋</span> Add meal</button>
+        </div>
+      </header>
+
+      <section class="page" id="weekView">
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">YOUR WEEK AT A GLANCE</p>
+            <h1>What’s cooking?</h1>
+            <p class="subtitle">A little planning now, a lot more ease later.</p>
+          </div>
+          <div class="date-nav">
+            <button class="icon-button" id="prevWeek" aria-label="Previous week">←</button>
+            <button class="date-range" id="weekRange"></button>
+            <button class="icon-button" id="nextWeek" aria-label="Next week">→</button>
+          </div>
+        </div>
+
+        <div class="week-layout">
+          <div class="week-grid-wrap">
+            <div class="week-grid" id="weekGrid"></div>
+          </div>
+          <aside class="right-rail">
+            <div class="rail-card shopping-preview">
+              <div class="card-title-row"><div><p class="eyebrow">THIS WEEK</p><h2>Shopping list</h2></div><button class="text-button" data-open-view="shopping">View all</button></div>
+              <div id="shoppingPreview"></div>
+            </div>
+            <div class="rail-card rhythm-card">
+              <p class="eyebrow">MEAL RHYTHM</p>
+              <h2>Keep it varied</h2>
+              <div class="rhythm-visual"><div class="rhythm-ring" id="varietyRing"><span id="varietyScore">0</span><small>unique meals</small></div></div>
+              <div id="repeatPreview" class="repeat-preview"></div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="page hidden" id="monthView">
+        <div class="page-heading">
+          <div><p class="eyebrow">THE BIG PICTURE</p><h1>Monthly menu</h1><p class="subtitle">See your food rhythm across the whole month.</p></div>
+          <div class="date-nav"><button class="icon-button" id="prevMonth">←</button><button class="date-range" id="monthRange"></button><button class="icon-button" id="nextMonth">→</button></div>
+        </div>
+        <div class="month-card"><div class="month-weekdays"><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span></div><div class="month-grid" id="monthGrid"></div></div>
+      </section>
+
+      <section class="page hidden" id="shoppingView">
+        <div class="page-heading"><div><p class="eyebrow">ONE CALM TRIP</p><h1>Shopping list</h1><p class="subtitle" id="shoppingSubtitle">Everything your plan calls for, neatly combined.</p></div><div class="segmented"><button class="active" data-list-scope="week">This week</button><button data-list-scope="month">This month</button></div></div>
+        <div class="shopping-layout"><div class="shopping-main" id="fullShoppingList"></div><aside class="summary-card"><p class="eyebrow">AT A GLANCE</p><h2>Basket summary</h2><div id="basketSummary"></div><button class="primary-button full-width" id="copyList">Copy shopping list</button></aside></div>
+      </section>
+
+      <section class="page hidden" id="insightsView">
+        <div class="page-heading"><div><p class="eyebrow">YOUR FOOD PATTERNS</p><h1>Meal insights</h1><p class="subtitle">Notice repeats, favourites and open spaces before they become routines.</p></div></div>
+        <div class="insights-grid"><div class="insight-card wide"><p class="eyebrow">MOST REPEATED</p><h2>Meals in rotation</h2><div id="repeatChart"></div></div><div class="insight-card"><p class="eyebrow">PLAN COVERAGE</p><h2 id="coverageValue">0%</h2><p>of meal slots planned this month</p><div class="progress"><span id="coverageBar"></span></div></div><div class="insight-card"><p class="eyebrow">TOP CATEGORY</p><h2 id="topMealType">No meals yet</h2><p id="topMealCopy">Start planning to see your pattern.</p></div></div>
+      </section>
+    </main>
+  </div>
+
+  <dialog class="meal-dialog" id="mealDialog">
+    <form method="dialog" id="mealForm">
+      <div class="dialog-head"><div><p class="eyebrow" id="dialogEyebrow">ADD TO YOUR PLAN</p><h2 id="dialogTitle">Create a meal</h2></div><button class="icon-button" value="cancel" aria-label="Close">×</button></div>
+      <div class="dialog-body">
+        <div class="form-row"><label>Date<input id="mealDate" type="date" required></label><label>Meal time<select id="mealType"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option></select></label></div>
+        <label>What are you thinking of?<div class="idea-input"><input id="mealName" placeholder="e.g. chicken curry" required><button type="button" id="generateButton">✦ Generate</button></div><small>Generate a practical recipe and shopping ingredients from the meal idea.</small></label>
+        <label>Short description<input id="mealDescription" placeholder="Creamy, warming and easy to make"></label>
+        <div class="form-row"><label>Servings<input id="mealServings" type="number" min="1" max="20" value="4"></label><label>Prep + cook<input id="mealTime" placeholder="35 min"></label></div>
+        <label>Ingredients<textarea id="mealIngredients" rows="5" placeholder="One ingredient per line, e.g. 500 g chicken breast"></textarea></label>
+        <label>Recipe steps<textarea id="mealRecipe" rows="6" placeholder="One step per line"></textarea></label>
+        <label>Video link<input id="mealVideo" type="url" placeholder="https://www.youtube.com/watch?v=..."></label>
+        <div class="video-preview hidden" id="videoPreview"></div>
+      </div>
+      <div class="dialog-actions"><button type="button" class="danger-button hidden" id="deleteMeal">Delete</button><span></span><button value="cancel" class="secondary-button">Cancel</button><button value="default" class="primary-button" id="saveMeal">Save meal</button></div>
+    </form>
+  </dialog>
+
+  <dialog class="settings-dialog" id="settingsDialog">
+    <form method="dialog"><div class="dialog-head"><div><p class="eyebrow">MY KITCHEN</p><h2>Planning preferences</h2></div><button class="icon-button" value="cancel">×</button></div><div class="dialog-body"><label>Shopping region<select id="regionSelect"><option value="Sweden">Sweden</option><option value="United States">United States</option><option value="United Kingdom">United Kingdom</option><option value="Kenya">Kenya</option><option value="Nigeria">Nigeria</option><option value="India">India</option><option value="Other">Other</option></select></label><label>Measurement system<select id="unitSelect"><option value="metric">Metric (g, kg, ml)</option><option value="imperial">Imperial (oz, lb, cups)</option></select></label><p class="settings-note">Your region helps tailor ingredient wording and shopping suggestions. A future connected recipe service can also use it for live local availability and prices.</p></div><div class="dialog-actions"><span></span><button value="default" class="primary-button" id="saveSettings">Save preferences</button></div></form>
+  </dialog>
+
+  <div class="toast" id="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>
