@@ -15,6 +15,7 @@
   background: var(--paper);
   color: var(--ink);
   font-weight: 700;
+  text-decoration: none;
 }
 
 .update-app-button span {
@@ -29,19 +30,6 @@
 .update-app-button:hover {
   border-color: var(--coral);
   color: var(--coral-dark);
-}
-
-.update-app-button.updating span {
-  animation: update-spin .7s linear infinite;
-}
-
-.update-app-button:disabled {
-  cursor: wait;
-  opacity: .7;
-}
-
-@keyframes update-spin {
-  to { transform: rotate(360deg); }
 }
 
 .plan-heading-actions {

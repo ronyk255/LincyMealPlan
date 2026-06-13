@@ -336,24 +336,6 @@ document.addEventListener("click",event=>{
 $("#prevWeek").onclick=()=>{currentWeek=addDays(currentWeek,-7);renderWeek();}; $("#nextWeek").onclick=()=>{currentWeek=addDays(currentWeek,7);renderWeek();};
 $("#prevMonth").onclick=()=>{currentMonth=new Date(currentMonth.getFullYear(),currentMonth.getMonth()-1,1);renderMonth();}; $("#nextMonth").onclick=()=>{currentMonth=new Date(currentMonth.getFullYear(),currentMonth.getMonth()+1,1);renderMonth();};
 $("#todayButton").onclick=()=>{currentWeek=startOfWeek(new Date());currentMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);renderAll();};
-$("#refreshAppButton").onclick=async()=>{
-  const button=$("#refreshAppButton");
-  button.disabled=true; button.classList.add("updating"); button.querySelector("b").textContent="Updating...";
-  try {
-    if("serviceWorker" in navigator) {
-      const registrations=await navigator.serviceWorker.getRegistrations();
-      await Promise.all(registrations.map(registration=>registration.unregister()));
-    }
-    if("caches" in window) {
-      const keys=await caches.keys();
-      await Promise.all(keys.map(key=>caches.delete(key)));
-    }
-  } finally {
-    const url=new URL(window.location.href);
-    url.searchParams.set("update",Date.now().toString());
-    window.location.replace(url.toString());
-  }
-};
 $("#quickAddButton").onclick=()=>openMeal(); $("#generateButton").onclick=generateRecipe; $("#saveMeal").onclick=saveMeal; $("#mealVideo").addEventListener("change",updateVideoPreview);
 $("#mealDialog").addEventListener("click",event=>{if(event.target===$("#mealDialog"))closeMealDialog();});
 $("#deleteMeal").onclick=()=>{if(editingKey){delete state.meals[editingKey];save();$("#mealDialog").close();renderAll();showToast("Meal removed");}};
