@@ -88,6 +88,15 @@ function parseIngredient(line) {
   return match?{quantity:match[1],unit:match[2]||"",name:match[3]}:{quantity:"",unit:"",name:clean};
 }
 
+function numericQuantity(value) {
+  if (!value) return null;
+  return value.split("+").reduce((total, part) => {
+    const clean=part.trim().replace(",",".");
+    if (clean.includes("/")) { const [a,b]=clean.split("/").map(Number); return total+(b?a/b:0); }
+    const number=Number(clean); return total+(Number.isFinite(number)?number:0);
+  },0);
+}
+
 function categoryFor(name) {
   const value=name.toLowerCase();
   if (/chicken|beef|salmon|fish|mince|egg/.test(value)) return "Protein";
@@ -107,6 +116,10 @@ function shoppingData(scope=listScope) {
     const category=categoryFor(item.name); grouped[category] ||= {};
     const id=`${category}|${normalized}`;
     if(!grouped[category][id]) grouped[category][id]={...item,id,meals:[]};
+    else if(grouped[category][id].unit.toLowerCase()===item.unit.toLowerCase()) {
+      const existing=numericQuantity(grouped[category][id].quantity), added=numericQuantity(item.quantity);
+      if(existing!==null&&added!==null) grouped[category][id].quantity=Number((existing+added).toFixed(2)).toString();
+    }
     if(!grouped[category][id].meals.includes(meal.name)) grouped[category][id].meals.push(meal.name);
   }));
   return grouped;
