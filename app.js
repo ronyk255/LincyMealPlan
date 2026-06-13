@@ -355,7 +355,6 @@ $("#refreshAppButton").onclick=async()=>{
   }
 };
 $("#quickAddButton").onclick=()=>openMeal(); $("#generateButton").onclick=generateRecipe; $("#saveMeal").onclick=saveMeal; $("#mealVideo").addEventListener("change",updateVideoPreview);
-$("#closeMealDialog").onclick=closeMealDialog; $("#cancelMealDialog").onclick=closeMealDialog;
 $("#mealDialog").addEventListener("click",event=>{if(event.target===$("#mealDialog"))closeMealDialog();});
 $("#deleteMeal").onclick=()=>{if(editingKey){delete state.meals[editingKey];save();$("#mealDialog").close();renderAll();showToast("Meal removed");}};
 $("#menuButton").onclick=()=>$("#sidebar").classList.toggle("open");

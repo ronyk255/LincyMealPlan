@@ -114,7 +114,7 @@
 
   <dialog class="meal-dialog" id="mealDialog">
     <form method="dialog" id="mealForm">
-      <div class="dialog-head"><div><p class="eyebrow" id="dialogEyebrow">ADD TO YOUR PLAN</p><h2 id="dialogTitle">Create a meal</h2></div><button type="button" class="icon-button" id="closeMealDialog" aria-label="Close">×</button></div>
+      <div class="dialog-head"><div><p class="eyebrow" id="dialogEyebrow">ADD TO YOUR PLAN</p><h2 id="dialogTitle">Create a meal</h2></div><button type="submit" formnovalidate value="cancel" class="icon-button" id="closeMealDialog" aria-label="Close">×</button></div>
       <div class="dialog-body">
         <div class="form-row"><label>Date<input id="mealDate" type="date" required></label><label>Meal time<select id="mealType"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option></select></label></div>
         <label>What are you thinking of?<div class="idea-input"><input id="mealName" placeholder="e.g. chicken curry" required><button type="button" id="generateButton">✦ Generate</button></div><small>Generate a practical recipe and shopping ingredients from the meal idea.</small></label>
@@ -125,7 +125,7 @@
         <label>Video link<input id="mealVideo" type="url" placeholder="https://www.youtube.com/watch?v=..."></label>
         <div class="video-preview hidden" id="videoPreview"></div>
       </div>
-      <div class="dialog-actions"><button type="button" class="danger-button hidden" id="deleteMeal">Delete</button><span></span><button type="button" class="secondary-button" id="cancelMealDialog">Cancel</button><button type="button" class="primary-button" id="saveMeal">Save meal</button></div>
+      <div class="dialog-actions"><button type="button" class="danger-button hidden" id="deleteMeal">Delete</button><span></span><button type="submit" formnovalidate value="cancel" class="secondary-button" id="cancelMealDialog">Cancel</button><button type="button" class="primary-button" id="saveMeal">Save meal</button></div>
     </form>
   </dialog>
 
