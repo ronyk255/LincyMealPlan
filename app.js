@@ -336,6 +336,24 @@ document.addEventListener("click",event=>{
 $("#prevWeek").onclick=()=>{currentWeek=addDays(currentWeek,-7);renderWeek();}; $("#nextWeek").onclick=()=>{currentWeek=addDays(currentWeek,7);renderWeek();};
 $("#prevMonth").onclick=()=>{currentMonth=new Date(currentMonth.getFullYear(),currentMonth.getMonth()-1,1);renderMonth();}; $("#nextMonth").onclick=()=>{currentMonth=new Date(currentMonth.getFullYear(),currentMonth.getMonth()+1,1);renderMonth();};
 $("#todayButton").onclick=()=>{currentWeek=startOfWeek(new Date());currentMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);renderAll();};
+$("#refreshAppButton").onclick=async()=>{
+  const button=$("#refreshAppButton");
+  button.disabled=true; button.classList.add("updating"); button.querySelector("b").textContent="Updating...";
+  try {
+    if("serviceWorker" in navigator) {
+      const registrations=await navigator.serviceWorker.getRegistrations();
+      await Promise.all(registrations.map(registration=>registration.unregister()));
+    }
+    if("caches" in window) {
+      const keys=await caches.keys();
+      await Promise.all(keys.map(key=>caches.delete(key)));
+    }
+  } finally {
+    const url=new URL(window.location.href);
+    url.searchParams.set("update",Date.now().toString());
+    window.location.replace(url.toString());
+  }
+};
 $("#quickAddButton").onclick=()=>openMeal(); $("#generateButton").onclick=generateRecipe; $("#saveMeal").onclick=saveMeal; $("#mealVideo").addEventListener("change",updateVideoPreview);
 $("#closeMealDialog").onclick=closeMealDialog; $("#cancelMealDialog").onclick=closeMealDialog;
 $("#mealDialog").addEventListener("click",event=>{if(event.target===$("#mealDialog"))closeMealDialog();});
@@ -355,4 +373,4 @@ document.addEventListener("keydown",event=>{if((event.ctrlKey||event.metaKey)&&e
 
 function renderSettings(){const units=state.settings.units==="metric"?"metric":"imperial";$("#profileRegion").textContent=`${state.settings.region} · ${units}`;}
 renderSettings(); renderWeek();
-if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js",{updateViaCache:"none"}).then(registration=>registration.update()).catch(()=>{}));
