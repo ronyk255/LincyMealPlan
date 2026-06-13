@@ -129,6 +129,30 @@
     </form>
   </dialog>
 
+  <dialog class="recipe-detail-dialog" id="recipeDetailDialog">
+    <div class="recipe-detail-head">
+      <div><p class="eyebrow" id="detailEyebrow">RECIPE DETAILS</p><h2 id="detailMealName"></h2><p id="detailDescription"></p></div>
+      <button type="button" class="icon-button" id="closeRecipeDetail" aria-label="Close">×</button>
+    </div>
+    <div class="recipe-detail-body">
+      <div class="recipe-meta" id="detailMeta"></div>
+      <div class="recipe-video" id="detailVideo"></div>
+      <div class="recipe-columns">
+        <section class="recipe-panel">
+          <div class="recipe-section-head"><div><p class="eyebrow">SHOPPING</p><h3>Ingredients</h3></div><button type="button" class="text-button detail-edit-button" id="editDetailIngredients">Edit items</button></div>
+          <p class="recipe-help">Check an item here and it is checked in your shopping list too.</p>
+          <div id="detailIngredients"></div>
+        </section>
+        <section class="recipe-panel">
+          <div class="recipe-section-head"><div><p class="eyebrow">LET'S COOK</p><h3>Method</h3></div></div>
+          <p class="recipe-help">Work through the recipe one step at a time.</p>
+          <div id="detailSteps"></div>
+        </section>
+      </div>
+    </div>
+    <div class="dialog-actions recipe-detail-actions"><span></span><button type="button" class="secondary-button" id="closeRecipeDetailBottom">Close</button><button type="button" class="primary-button" id="editDetailMeal">Edit recipe</button></div>
+  </dialog>
+
   <dialog class="settings-dialog" id="settingsDialog">
     <form method="dialog"><div class="dialog-head"><div><p class="eyebrow">MY KITCHEN</p><h2>Planning preferences</h2></div><button class="icon-button" value="cancel">×</button></div><div class="dialog-body"><label>Shopping region<select id="regionSelect"><option value="Sweden">Sweden</option><option value="United States">United States</option><option value="United Kingdom">United Kingdom</option><option value="Kenya">Kenya</option><option value="Nigeria">Nigeria</option><option value="India">India</option><option value="Other">Other</option></select></label><label>Measurement system<select id="unitSelect"><option value="metric">Metric (g, kg, ml)</option><option value="imperial">Imperial (oz, lb, cups)</option></select></label><p class="settings-note">Your region helps tailor ingredient wording and shopping suggestions. A future connected recipe service can also use it for live local availability and prices.</p></div><div class="dialog-actions"><span></span><button value="default" class="primary-button" id="saveSettings">Save preferences</button></div></form>
   </dialog>

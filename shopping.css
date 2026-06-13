@@ -135,6 +135,159 @@
   border-color: #e5b7ad;
 }
 
+.recipe-detail-dialog {
+  width: min(980px, calc(100vw - 28px));
+  max-height: 92vh;
+  padding: 0;
+  border: 0;
+  border-radius: 24px;
+  background: var(--cream);
+  color: var(--ink);
+  box-shadow: 0 30px 100px rgba(20, 48, 40, .34);
+}
+
+.recipe-detail-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 26px 30px 22px;
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+}
+
+.recipe-detail-head h2 {
+  margin: 0;
+  font: 700 clamp(30px, 4vw, 46px) "Playfair Display", serif;
+  letter-spacing: -1px;
+}
+
+.recipe-detail-head > div > p:last-child {
+  max-width: 650px;
+  margin: 7px 0 0;
+  color: var(--muted);
+}
+
+.recipe-detail-body {
+  padding: 24px 30px 30px;
+  overflow: auto;
+  max-height: calc(92vh - 190px);
+}
+
+.recipe-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.recipe-meta span {
+  padding: 7px 10px;
+  border-radius: 20px;
+  background: #e9eee8;
+  color: var(--ink-2);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.recipe-video {
+  min-height: 280px;
+  aspect-ratio: 16 / 8;
+  overflow: hidden;
+  border-radius: 18px;
+  background: var(--ink);
+  box-shadow: var(--shadow);
+}
+
+.recipe-video iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.video-empty {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  padding: 30px;
+  color: white;
+  text-align: center;
+}
+
+.video-empty > span {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--coral);
+  font-size: 20px;
+}
+
+.video-empty h3 { margin: 13px 0 4px; }
+.video-empty p { margin: 0 0 12px; color: rgba(255,255,255,.7); font-size: 12px; }
+.video-empty a,
+.video-empty button { border: 0; background: transparent; color: #ffd1c6; font-weight: 700; text-decoration: underline; }
+
+.recipe-columns {
+  display: grid;
+  grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.recipe-panel {
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--paper);
+}
+
+.recipe-section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.recipe-section-head h3 {
+  margin: 0;
+  font: 600 24px "Playfair Display", serif;
+}
+
+.recipe-help {
+  margin: 6px 0 15px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.detail-check-row,
+.detail-step {
+  display: grid;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+}
+
+.detail-check-row { grid-template-columns: 20px 1fr; }
+.detail-step { grid-template-columns: 20px 28px 1fr; align-items: start; }
+.detail-check-row:last-child,
+.detail-step:last-child { border-bottom: 0; }
+.detail-check-row input,
+.detail-step input { width: 17px; height: 17px; accent-color: var(--coral); }
+.detail-check-row strong,
+.detail-check-row small { display: block; }
+.detail-check-row strong { font-size: 13px; }
+.detail-check-row small { margin-top: 2px; color: var(--muted); font-size: 10px; }
+.detail-step b { width: 26px; height: 26px; display: grid; place-items: center; border-radius: 50%; background: var(--sage); font-size: 11px; }
+.detail-step span { padding-top: 3px; font-size: 13px; line-height: 1.45; }
+.detail-step.done span { color: var(--muted); text-decoration: line-through; }
+.detail-step.done b { background: var(--ink); color: white; }
+.recipe-detail-actions { background: var(--paper); }
+
 .shopping-row {
   grid-template-columns: 22px minmax(120px, 1fr) auto auto;
   align-items: center;
@@ -174,6 +327,13 @@
 }
 
 @media (max-width: 760px) {
+  .recipe-detail-head { padding: 20px 18px 16px; }
+  .recipe-detail-body { padding: 16px 18px 24px; max-height: calc(92vh - 180px); }
+  .recipe-video { min-height: 190px; aspect-ratio: 16 / 9; }
+  .recipe-columns { grid-template-columns: 1fr; }
+  .recipe-panel { padding: 16px; }
+  .recipe-detail-actions .secondary-button { display: none; }
+
   .today-button {
     width: 42px;
     justify-content: center;

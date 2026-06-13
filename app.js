@@ -8,14 +8,14 @@ const startOfWeek = date => addDays(date, -((date.getDay() + 6) % 7));
 const escapeHtml = value => String(value || "").replace(/[&<>'"]/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[char]));
 
 const recipeLibrary = [
-  {match:["curry","tikka","masala"],description:"A warming, aromatic curry with a silky tomato-coconut sauce.",time:"40 min",ingredients:["600 g chicken thigh","1 onion","3 garlic cloves","20 g fresh ginger","2 tbsp curry powder","400 ml coconut milk","400 g chopped tomatoes","300 g basmati rice","1 bunch fresh coriander","1 lime"],steps:["Dice the chicken and season lightly.","Soften the chopped onion, garlic and ginger in oil.","Stir in curry powder, then add chicken and brown for 5 minutes.","Add tomatoes and coconut milk; simmer for 20 minutes.","Cook the rice, finish the curry with lime and serve with coriander."],video:"https://www.youtube.com/results?search_query=easy+chicken+curry+recipe"},
-  {match:["pasta","spaghetti","bolognese","lasagne"],description:"A comforting pasta dinner with a rich, herb-filled tomato sauce.",time:"35 min",ingredients:["400 g pasta","500 g minced beef","1 onion","2 garlic cloves","400 g chopped tomatoes","2 tbsp tomato paste","1 tsp dried oregano","50 g parmesan","1 bag green salad"],steps:["Cook the pasta in well-salted water.","Brown the mince, then add diced onion and garlic.","Stir in tomato paste, tomatoes and oregano.","Simmer for 15 minutes and season to taste.","Toss with pasta and finish with parmesan."],video:"https://www.youtube.com/results?search_query=easy+pasta+recipe"},
-  {match:["salmon","fish"],description:"Oven-roasted salmon with bright lemon, herbs and seasonal vegetables.",time:"30 min",ingredients:["600 g salmon fillet","800 g baby potatoes","1 broccoli","1 lemon","2 tbsp olive oil","1 bunch dill","200 ml yoghurt","1 garlic clove"],steps:["Heat the oven to 210°C.","Halve potatoes, season and roast for 15 minutes.","Add broccoli and salmon; drizzle with oil and lemon.","Roast for 12–15 minutes until the salmon flakes.","Mix yoghurt, dill and garlic, then serve alongside."],video:"https://www.youtube.com/results?search_query=oven+baked+salmon+recipe"},
-  {match:["taco","burrito","quesadilla"],description:"Colourful, build-your-own tacos with punchy toppings.",time:"30 min",ingredients:["12 small tortillas","500 g minced beef","1 sachet taco seasoning","1 can black beans","2 tomatoes","1 avocado","1 lime","150 g grated cheese","150 ml sour cream","1 lettuce"],steps:["Brown the mince with taco seasoning.","Warm and season the drained black beans.","Chop tomatoes, lettuce and avocado.","Warm tortillas in a dry pan.","Set everything out and let everyone build their own tacos."],video:"https://www.youtube.com/results?search_query=easy+beef+tacos+recipe"},
-  {match:["soup","stew"],description:"A generous one-pot meal packed with vegetables and deep savoury flavour.",time:"45 min",ingredients:["1 onion","3 carrots","2 celery stalks","3 potatoes","1 litre vegetable stock","1 can white beans","2 garlic cloves","1 tsp dried thyme","1 loaf crusty bread"],steps:["Chop all vegetables into even pieces.","Soften onion, celery and carrots in a large pot.","Add garlic, potatoes, thyme and stock.","Simmer for 25 minutes, then stir in the beans.","Season well and serve with warm bread."],video:"https://www.youtube.com/results?search_query=easy+hearty+soup+recipe"},
-  {match:["pancake","waffle"],description:"Fluffy golden pancakes for an easy, unhurried breakfast.",time:"20 min",ingredients:["250 g plain flour","2 tsp baking powder","2 eggs","350 ml milk","50 g butter","200 g fresh berries","150 ml yoghurt","2 tbsp maple syrup"],steps:["Whisk flour and baking powder together.","Beat in eggs and milk until just smooth.","Melt a little butter in a medium-hot pan.","Cook small ladlefuls until bubbles appear, then flip.","Serve warm with berries, yoghurt and maple syrup."],video:"https://www.youtube.com/results?search_query=fluffy+pancakes+recipe"},
-  {match:["oat","porridge","granola"],description:"A nourishing breakfast bowl with fruit, gentle spice and crunch.",time:"10 min",ingredients:["200 g rolled oats","600 ml milk","2 bananas","1 tsp cinnamon","100 g mixed berries","50 g nuts","2 tbsp honey"],steps:["Combine oats and milk in a saucepan.","Simmer gently for 5 minutes, stirring often.","Mash in one banana and add cinnamon.","Divide into bowls.","Top with sliced banana, berries, nuts and honey."],video:"https://www.youtube.com/results?search_query=healthy+oatmeal+breakfast"},
-  {match:["salad","bowl"],description:"A crisp, satisfying bowl layered with grains, vegetables and a fresh dressing.",time:"25 min",ingredients:["250 g quinoa","1 cucumber","250 g cherry tomatoes","1 can chickpeas","1 avocado","100 g feta","1 lemon","2 tbsp olive oil","1 bag mixed leaves"],steps:["Cook quinoa according to the packet and cool slightly.","Drain chickpeas and chop the vegetables.","Whisk lemon juice and olive oil with salt and pepper.","Layer leaves, quinoa, chickpeas and vegetables.","Crumble over feta and spoon on the dressing."],video:"https://www.youtube.com/results?search_query=healthy+grain+bowl+recipe"}
+  {match:["curry","tikka","masala"],description:"A warming, aromatic curry with a silky tomato-coconut sauce.",time:"40 min",ingredients:["600 g chicken thigh","1 onion","3 garlic cloves","20 g fresh ginger","2 tbsp curry powder","400 ml coconut milk","400 g chopped tomatoes","300 g basmati rice","1 bunch fresh coriander","1 lime"],steps:["Dice the chicken and season lightly.","Soften the chopped onion, garlic and ginger in oil.","Stir in curry powder, then add chicken and brown for 5 minutes.","Add tomatoes and coconut milk; simmer for 20 minutes.","Cook the rice, finish the curry with lime and serve with coriander."],video:"https://www.youtube.com/watch?v=WRYOVVexMhU"},
+  {match:["pasta","spaghetti","bolognese","lasagne"],description:"A comforting pasta dinner with a rich, herb-filled tomato sauce.",time:"35 min",ingredients:["400 g pasta","500 g minced beef","1 onion","2 garlic cloves","400 g chopped tomatoes","2 tbsp tomato paste","1 tsp dried oregano","50 g parmesan","1 bag green salad"],steps:["Cook the pasta in well-salted water.","Brown the mince, then add diced onion and garlic.","Stir in tomato paste, tomatoes and oregano.","Simmer for 15 minutes and season to taste.","Toss with pasta and finish with parmesan."],video:"https://www.youtube.com/watch?v=sGFxHqs3TUY"},
+  {match:["salmon","fish"],description:"Oven-roasted salmon with bright lemon, herbs and seasonal vegetables.",time:"30 min",ingredients:["600 g salmon fillet","800 g baby potatoes","1 broccoli","1 lemon","2 tbsp olive oil","1 bunch dill","200 ml yoghurt","1 garlic clove"],steps:["Heat the oven to 210°C.","Halve potatoes, season and roast for 15 minutes.","Add broccoli and salmon; drizzle with oil and lemon.","Roast for 12–15 minutes until the salmon flakes.","Mix yoghurt, dill and garlic, then serve alongside."],video:"https://www.youtube.com/watch?v=2uYoqclu6so"},
+  {match:["taco","burrito","quesadilla"],description:"Colourful, build-your-own tacos with punchy toppings.",time:"30 min",ingredients:["12 small tortillas","500 g minced beef","1 sachet taco seasoning","1 can black beans","2 tomatoes","1 avocado","1 lime","150 g grated cheese","150 ml sour cream","1 lettuce"],steps:["Brown the mince with taco seasoning.","Warm and season the drained black beans.","Chop tomatoes, lettuce and avocado.","Warm tortillas in a dry pan.","Set everything out and let everyone build their own tacos."],video:"https://www.youtube.com/watch?v=dwwqoU7nN-E"},
+  {match:["soup","stew"],description:"A generous one-pot meal packed with vegetables and deep savoury flavour.",time:"45 min",ingredients:["1 onion","3 carrots","2 celery stalks","3 potatoes","1 litre vegetable stock","1 can white beans","2 garlic cloves","1 tsp dried thyme","1 loaf crusty bread"],steps:["Chop all vegetables into even pieces.","Soften onion, celery and carrots in a large pot.","Add garlic, potatoes, thyme and stock.","Simmer for 25 minutes, then stir in the beans.","Season well and serve with warm bread."],video:"https://www.youtube.com/watch?v=k1JUIIPlENk"},
+  {match:["pancake","waffle"],description:"Fluffy golden pancakes for an easy, unhurried breakfast.",time:"20 min",ingredients:["250 g plain flour","2 tsp baking powder","2 eggs","350 ml milk","50 g butter","200 g fresh berries","150 ml yoghurt","2 tbsp maple syrup"],steps:["Whisk flour and baking powder together.","Beat in eggs and milk until just smooth.","Melt a little butter in a medium-hot pan.","Cook small ladlefuls until bubbles appear, then flip.","Serve warm with berries, yoghurt and maple syrup."],video:"https://www.youtube.com/watch?v=RaLzxZryEoA"},
+  {match:["oat","porridge","granola"],description:"A nourishing breakfast bowl with fruit, gentle spice and crunch.",time:"10 min",ingredients:["200 g rolled oats","600 ml milk","2 bananas","1 tsp cinnamon","100 g mixed berries","50 g nuts","2 tbsp honey"],steps:["Combine oats and milk in a saucepan.","Simmer gently for 5 minutes, stirring often.","Mash in one banana and add cinnamon.","Divide into bowls.","Top with sliced banana, berries, nuts and honey."],video:"https://www.youtube.com/watch?v=VZOHHCosuzY"},
+  {match:["salad","bowl"],description:"A crisp, satisfying bowl layered with grains, vegetables and a fresh dressing.",time:"25 min",ingredients:["250 g quinoa","1 cucumber","250 g cherry tomatoes","1 can chickpeas","1 avocado","100 g feta","1 lemon","2 tbsp olive oil","1 bag mixed leaves"],steps:["Cook quinoa according to the packet and cool slightly.","Drain chickpeas and chop the vegetables.","Whisk lemon juice and olive oil with salt and pepper.","Layer leaves, quinoa, chickpeas and vegetables.","Crumble over feta and spoon on the dressing."],video:"https://www.youtube.com/watch?v=9dbpVyiGxT8"}
 ];
 
 const defaultRecipe = name => ({description:`A simple, adaptable ${name.toLowerCase()} made with everyday ingredients.`,time:"35 min",ingredients:[`500 g main ingredient for ${name}`,"1 onion","2 garlic cloves","2 tbsp cooking oil","500 g seasonal vegetables","1 tsp preferred seasoning","1 fresh herb or garnish","1 pantry staple to serve"],steps:["Prepare and chop all ingredients.","Warm the oil and cook the onion until soft.",`Add the main ingredients for ${name} and cook until well coloured.`,"Add seasoning and a splash of water; simmer until cooked through.","Taste, adjust seasoning and serve with your chosen garnish."],video:`https://www.youtube.com/results?search_query=${encodeURIComponent(name + " recipe")}`});
@@ -34,8 +34,8 @@ function seedMeals() {
 
 let state;
 try { state = JSON.parse(localStorage.getItem(STORE_KEY)); } catch {}
-state = state || {meals:seedMeals(),settings:{region:"Sweden",units:"metric"},checked:{},shoppingOverrides:{}};
-state.meals ||= {}; state.settings ||= {region:"Sweden",units:"metric"}; state.checked ||= {}; state.shoppingOverrides ||= {};
+state = state || {meals:seedMeals(),settings:{region:"Sweden",units:"metric"},checked:{},shoppingOverrides:{},recipeChecks:{}};
+state.meals ||= {}; state.settings ||= {region:"Sweden",units:"metric"}; state.checked ||= {}; state.shoppingOverrides ||= {}; state.recipeChecks ||= {};
 let currentWeek = startOfWeek(new Date());
 let currentMonth = new Date(new Date().getFullYear(),new Date().getMonth(),1);
 let currentView = "week";
@@ -43,6 +43,7 @@ let listScope = "week";
 let editingKey = null;
 let editingShoppingId = null;
 let clearPlanContext = "week";
+let viewingMealKey = null;
 
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
@@ -67,7 +68,7 @@ function renderWeek() {
     const date=addDays(currentWeek,i), key=dateKey(date);
     const slots=TYPES.map(type=>{
       const meal=state.meals[mealKey(key,type)];
-      return `<div class="meal-slot ${meal?"filled":""}" data-type="${type}"><span class="slot-label">${type}</span>${meal?`<button class="meal-card" data-edit="${key}|${type}"><strong>${escapeHtml(meal.name)}</strong><small>${escapeHtml(meal.time||"")} · ${meal.servings||4} servings</small></button>`:`<button class="add-slot" data-add-date="${key}" data-add-type="${type}" aria-label="Add ${type}">＋</button>`}</div>`;
+      return `<div class="meal-slot ${meal?"filled":""}" data-type="${type}"><span class="slot-label">${type}</span>${meal?`<button class="meal-card" data-view-meal="${key}|${type}"><strong>${escapeHtml(meal.name)}</strong><small>${escapeHtml(meal.time||"")} · ${meal.servings||4} servings</small></button>`:`<button class="add-slot" data-add-date="${key}" data-add-type="${type}" aria-label="Add ${type}">＋</button>`}</div>`;
     }).join("");
     return `<div class="day-column"><div class="day-header ${key===today?"today":""}"><span class="day-name">${date.toLocaleDateString(undefined,{weekday:"short"}).toUpperCase()}</span><span class="day-number">${date.getDate()}</span></div>${slots}</div>`;
   }).join("");
@@ -80,7 +81,7 @@ function renderMonth() {
   const today=dateKey(new Date());
   $("#monthGrid").innerHTML=Array.from({length:42},(_,i)=>{
     const date=addDays(gridStart,i), key=dateKey(date), dayMeals=TYPES.map(type=>state.meals[mealKey(key,type)]).filter(Boolean);
-    return `<div class="month-day ${date.getMonth()!==currentMonth.getMonth()?"outside":""} ${key===today?"today":""}"><span class="month-num">${date.getDate()}</span>${dayMeals.slice(0,4).map(meal=>`<button class="month-meal" data-type="${meal.type}" data-edit="${meal.date}|${meal.type}" title="${escapeHtml(meal.name)}">${escapeHtml(meal.name)}</button>`).join("")}<button class="month-add" data-add-date="${key}" data-add-type="Dinner">＋</button></div>`;
+    return `<div class="month-day ${date.getMonth()!==currentMonth.getMonth()?"outside":""} ${key===today?"today":""}"><span class="month-num">${date.getDate()}</span>${dayMeals.slice(0,4).map(meal=>`<button class="month-meal" data-type="${meal.type}" data-view-meal="${meal.date}|${meal.type}" title="${escapeHtml(meal.name)}">${escapeHtml(meal.name)}</button>`).join("")}<button class="month-add" data-add-date="${key}" data-add-type="Dinner">＋</button></div>`;
   }).join("");
 }
 
@@ -106,6 +107,12 @@ function categoryFor(name) {
   if (/onion|garlic|ginger|tomato|potato|carrot|celery|broccoli|lemon|lime|avocado|lettuce|cucumber|berries|banana|herb|coriander|dill|vegetable|leaves/.test(value)) return "Fresh produce";
   if (/bread|tortilla/.test(value)) return "Bakery";
   return "Pantry";
+}
+
+function ingredientShoppingId(line) {
+  const item=parseIngredient(line);
+  const normalized=item.name.toLowerCase().replace(/[^a-z0-9 ]/g,"").trim();
+  return `${categoryFor(item.name)}|${normalized}`;
 }
 
 function shoppingPeriodKey(scope=listScope) {
@@ -199,6 +206,50 @@ function switchView(view) {
   if(view==="month")renderMonth(); if(view==="shopping")renderShopping(); if(view==="insights")renderInsights();
 }
 
+function youtubeVideoId(url="") {
+  return url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|shorts\/|watch\?v=))([\w-]{11})/)?.[1]||null;
+}
+
+function closeRecipeDetail() {
+  $("#recipeDetailDialog").close();
+  viewingMealKey=null;
+  $("#detailVideo").innerHTML="";
+}
+
+function renderRecipeDetail() {
+  const meal=state.meals[viewingMealKey];
+  if(!meal){closeRecipeDetail();return;}
+  const date=parseDate(meal.date),fallbackVideo=recipeFor(meal.name).video,videoId=youtubeVideoId(meal.video)||youtubeVideoId(fallbackVideo);
+  $("#detailEyebrow").textContent=`${meal.type} · ${date.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"})}`;
+  $("#detailMealName").textContent=meal.name;
+  $("#detailDescription").textContent=meal.description||"A meal from your plan.";
+  $("#detailMeta").innerHTML=`<span>◷ ${escapeHtml(meal.time||"Time not set")}</span><span>♙ ${meal.servings||4} servings</span><span>⌑ ${(meal.ingredients||[]).length} ingredients</span>`;
+  $("#detailVideo").innerHTML=videoId
+    ? `<iframe src="https://www.youtube-nocookie.com/embed/${videoId}?rel=0" title="${escapeHtml(meal.name)} recipe video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`
+    : `<div class="video-empty"><span>▶</span><h3>Choose a cooking video</h3><p>This recipe has a search link rather than a direct playable video.</p>${meal.video?`<a href="${escapeHtml(meal.video)}" target="_blank" rel="noopener">Find a video</a>`:""}<button type="button" data-edit-video>Add direct video link</button></div>`;
+  $("#detailIngredients").innerHTML=(meal.ingredients||[]).map(line=>{
+    const item=parseIngredient(line),id=ingredientShoppingId(line);
+    return `<label class="detail-check-row"><input type="checkbox" data-check="${escapeHtml(id)}" ${state.checked[id]?"checked":""}><span><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml([item.quantity,item.unit].filter(Boolean).join(" ")||"As needed")}</small></span></label>`;
+  }).join("")||`<p class="recipe-help">No ingredients added yet.</p>`;
+  state.recipeChecks[viewingMealKey] ||= {};
+  $("#detailSteps").innerHTML=(meal.steps||[]).map((step,index)=>`<label class="detail-step ${state.recipeChecks[viewingMealKey][index]?"done":""}"><input type="checkbox" data-step-check="${index}" ${state.recipeChecks[viewingMealKey][index]?"checked":""}><b>${index+1}</b><span>${escapeHtml(step)}</span></label>`).join("")||`<p class="recipe-help">No cooking steps added yet.</p>`;
+}
+
+function openRecipeDetail(key) {
+  if(!state.meals[key])return;
+  viewingMealKey=key;
+  renderRecipeDetail();
+  $("#recipeDetailDialog").showModal();
+}
+
+function editViewedMeal(field=null) {
+  const key=viewingMealKey;
+  if(!key)return;
+  closeRecipeDetail();
+  openMeal(null,null,key);
+  if(field)setTimeout(()=>$(field).focus(),80);
+}
+
 function openMeal(date=dateKey(new Date()),type="Dinner",key=null) {
   editingKey=key;
   const meal=key?state.meals[key]:null;
@@ -240,7 +291,7 @@ function saveMeal(event) {
     $("#mealIngredients").value=generated.ingredients.join("\n"); $("#mealRecipe").value ||= generated.steps.join("\n"); $("#mealVideo").value ||= generated.video;
   }
   const meal={date,type,name,description:$("#mealDescription").value.trim(),servings:Number($("#mealServings").value)||4,time:$("#mealTime").value.trim(),ingredients:$("#mealIngredients").value.split("\n").map(v=>v.trim()).filter(Boolean),steps:$("#mealRecipe").value.split("\n").map(v=>v.trim()).filter(Boolean),video:$("#mealVideo").value.trim()};
-  if(editingKey&&editingKey!==newKey)delete state.meals[editingKey]; state.meals[newKey]=meal; save(); $("#mealDialog").close(); renderAll(); showToast("Meal saved to your plan");
+  if(editingKey&&editingKey!==newKey){delete state.meals[editingKey];if(state.recipeChecks[editingKey]){state.recipeChecks[newKey]=state.recipeChecks[editingKey];delete state.recipeChecks[editingKey];}} state.meals[newKey]=meal; save(); $("#mealDialog").close(); renderAll(); showToast("Meal saved to your plan");
 }
 
 function findShoppingItem(id) {
@@ -312,7 +363,7 @@ function deleteMealsByScope(scope) {
     const [start,end]=ranges[scope];
     keys=Object.entries(state.meals).filter(([,meal])=>{const date=parseDate(meal.date);return date>=start&&date<=end;}).map(([key])=>key);
   }
-  keys.forEach(key=>delete state.meals[key]);
+  keys.forEach(key=>{delete state.meals[key];delete state.recipeChecks[key];});
   save(); closeClearPlan(); renderAll();
   showToast(`${keys.length} ${keys.length===1?"meal":"meals"} deleted`);
 }
@@ -321,16 +372,18 @@ function renderAll(){renderWeek();if(currentView==="month")renderMonth();if(curr
 
 document.addEventListener("click",event=>{
   const add=event.target.closest("[data-add-date]"); if(add)openMeal(add.dataset.addDate,add.dataset.addType);
-  const edit=event.target.closest("[data-edit]"); if(edit)openMeal(null,null,edit.dataset.edit);
+  const viewMeal=event.target.closest("[data-view-meal]"); if(viewMeal)openRecipeDetail(viewMeal.dataset.viewMeal);
   const nav=event.target.closest("[data-view]"); if(nav)switchView(nav.dataset.view);
   const openView=event.target.closest("[data-open-view]"); if(openView)switchView(openView.dataset.openView);
   const scope=event.target.closest("[data-list-scope]"); if(scope){listScope=scope.dataset.listScope;$$(`[data-list-scope]`).forEach(b=>b.classList.toggle("active",b===scope));renderShopping();}
-  const check=event.target.closest("[data-check]"); if(check){state.checked[check.dataset.check]=check.checked;save();if(currentView==="shopping")renderShopping();}
+  const check=event.target.closest("[data-check]"); if(check){state.checked[check.dataset.check]=check.checked;save();renderSidebars();if(currentView==="shopping")renderShopping();}
   const editShopping=event.target.closest("[data-edit-shopping]"); if(editShopping)openShoppingItem(decodeURIComponent(editShopping.dataset.editShopping));
   const deleteShopping=event.target.closest("[data-delete-shopping]"); if(deleteShopping)deleteShoppingItem(decodeURIComponent(deleteShopping.dataset.deleteShopping));
   if(event.target.closest("[data-add-shopping]"))openShoppingItem();
   const openClear=event.target.closest("[data-open-clear-plan]"); if(openClear)openClearPlan(openClear.dataset.openClearPlan);
   const clearScope=event.target.closest("[data-clear-scope]"); if(clearScope&&!clearScope.disabled)deleteMealsByScope(clearScope.dataset.clearScope);
+  if(event.target.closest("[data-edit-video]"))editViewedMeal("#mealVideo");
+  const stepCheck=event.target.closest("[data-step-check]"); if(stepCheck&&viewingMealKey){state.recipeChecks[viewingMealKey][stepCheck.dataset.stepCheck]=stepCheck.checked;save();stepCheck.closest(".detail-step").classList.toggle("done",stepCheck.checked);}
 });
 
 $("#prevWeek").onclick=()=>{currentWeek=addDays(currentWeek,-7);renderWeek();}; $("#nextWeek").onclick=()=>{currentWeek=addDays(currentWeek,7);renderWeek();};
@@ -344,7 +397,11 @@ $("#todayButton").onclick=()=>{
 };
 $("#quickAddButton").onclick=()=>openMeal(); $("#generateButton").onclick=generateRecipe; $("#saveMeal").onclick=saveMeal; $("#mealVideo").addEventListener("change",updateVideoPreview);
 $("#mealDialog").addEventListener("click",event=>{if(event.target===$("#mealDialog"))closeMealDialog();});
-$("#deleteMeal").onclick=()=>{if(editingKey){delete state.meals[editingKey];save();$("#mealDialog").close();renderAll();showToast("Meal removed");}};
+$("#closeRecipeDetail").onclick=closeRecipeDetail; $("#closeRecipeDetailBottom").onclick=closeRecipeDetail;
+$("#recipeDetailDialog").addEventListener("click",event=>{if(event.target===$("#recipeDetailDialog"))closeRecipeDetail();});
+$("#recipeDetailDialog").addEventListener("close",()=>{viewingMealKey=null;$("#detailVideo").innerHTML="";});
+$("#editDetailMeal").onclick=()=>editViewedMeal(); $("#editDetailIngredients").onclick=()=>editViewedMeal("#mealIngredients");
+$("#deleteMeal").onclick=()=>{if(editingKey){delete state.meals[editingKey];delete state.recipeChecks[editingKey];save();$("#mealDialog").close();renderAll();showToast("Meal removed");}};
 $("#menuButton").onclick=()=>$("#sidebar").classList.toggle("open");
 $("#profileButton").onclick=()=>{$("#regionSelect").value=state.settings.region;$("#unitSelect").value=state.settings.units;$("#settingsDialog").showModal();};
 $("#saveSettings").onclick=()=>{state.settings={region:$("#regionSelect").value,units:$("#unitSelect").value};save();renderSettings();showToast("Kitchen preferences saved");};
@@ -355,7 +412,7 @@ $("#closeShoppingItem").onclick=closeShoppingItemDialog; $("#cancelShoppingItem"
 $("#shoppingItemDialog").addEventListener("click",event=>{if(event.target===$("#shoppingItemDialog"))closeShoppingItemDialog();});
 $("#closeClearPlan").onclick=closeClearPlan; $("#cancelClearPlan").onclick=closeClearPlan;
 $("#clearPlanDialog").addEventListener("click",event=>{if(event.target===$("#clearPlanDialog"))closeClearPlan();});
-$("#globalSearch").addEventListener("input",event=>{const q=event.target.value.trim().toLowerCase();if(!q){renderAll();return;}const matches=Object.entries(state.meals).filter(([,meal])=>meal.name.toLowerCase().includes(q)||meal.ingredients.some(i=>i.toLowerCase().includes(q)));if(currentView!=="week")switchView("week");$$('.meal-slot.filled').forEach(slot=>slot.style.opacity=".25");matches.forEach(([key])=>{const button=document.querySelector(`[data-edit="${key}"]`);if(button)button.closest(".meal-slot").style.opacity="1";});});
+$("#globalSearch").addEventListener("input",event=>{const q=event.target.value.trim().toLowerCase();if(!q){renderAll();return;}const matches=Object.entries(state.meals).filter(([,meal])=>meal.name.toLowerCase().includes(q)||meal.ingredients.some(i=>i.toLowerCase().includes(q)));if(currentView!=="week")switchView("week");$$('.meal-slot.filled').forEach(slot=>slot.style.opacity=".25");matches.forEach(([key])=>{const button=document.querySelector(`[data-view-meal="${key}"]`);if(button)button.closest(".meal-slot").style.opacity="1";});});
 document.addEventListener("keydown",event=>{if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==="k"){event.preventDefault();$("#globalSearch").focus();}});
 
 function renderSettings(){const units=state.settings.units==="metric"?"metric":"imperial";$("#profileRegion").textContent=`${state.settings.region} · ${units}`;}
