@@ -162,6 +162,68 @@
   letter-spacing: -1px;
 }
 
+.detail-title-row {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.detail-meal-icon {
+  width: 54px;
+  height: 54px;
+  flex: 0 0 54px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: var(--meal-bg, #edf2ed);
+  box-shadow: inset 0 0 0 1px rgba(23, 63, 53, .07);
+  font-size: 28px;
+}
+
+.meal-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.meal-card-icon {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: rgba(255,255,255,.52);
+  font-size: 17px;
+  box-shadow: inset 0 0 0 1px rgba(23,63,53,.05);
+}
+
+.meal-card-copy {
+  min-width: 0;
+}
+
+.meal-theme-curry { --meal-bg: #f6d9a8; background-color: #f6e4c5 !important; }
+.meal-theme-pasta { --meal-bg: #f5c6b3; background-color: #f7ddd1 !important; }
+.meal-theme-seafood { --meal-bg: #bcdfe5; background-color: #d9edf0 !important; }
+.meal-theme-taco { --meal-bg: #f2cb77; background-color: #f6e1ad !important; }
+.meal-theme-soup { --meal-bg: #ddbd91; background-color: #ead8bd !important; }
+.meal-theme-salad { --meal-bg: #bdddba; background-color: #dcebd9 !important; }
+.meal-theme-pancake { --meal-bg: #ead092; background-color: #f3e3ba !important; }
+.meal-theme-breakfast { --meal-bg: #e8cf9d; background-color: #f1e3c5 !important; }
+.meal-theme-pizza { --meal-bg: #efb09f; background-color: #f7d4ca !important; }
+.meal-theme-sandwich { --meal-bg: #d8c69f; background-color: #e9dfc8 !important; }
+.meal-theme-protein { --meal-bg: #e4b2a8; background-color: #efd2cc !important; }
+.meal-theme-rice { --meal-bg: #ddd2a8; background-color: #eee8ce !important; }
+.meal-theme-dessert { --meal-bg: #e5bfd9; background-color: #f0ddec !important; }
+.meal-theme-fruit { --meal-bg: #efb8bd; background-color: #f6d9dc !important; }
+.meal-theme-lunch { --meal-bg: #edc9ad; background-color: #f3dfcf !important; }
+.meal-theme-snack { --meal-bg: #e8d28e; background-color: #f4e8c9 !important; }
+.meal-theme-dinner { --meal-bg: #c6dcdc; background-color: #dce6e6 !important; }
+
+.month-meal span {
+  margin-right: 2px;
+}
+
 .recipe-detail-head > div > p:last-child {
   max-width: 650px;
   margin: 7px 0 0;
@@ -327,6 +389,7 @@
 }
 
 @media (max-width: 760px) {
+  .detail-meal-icon { width: 46px; height: 46px; flex-basis: 46px; font-size: 24px; }
   .recipe-detail-head { padding: 20px 18px 16px; }
   .recipe-detail-body { padding: 16px 18px 24px; max-height: calc(92vh - 180px); }
   .recipe-video { min-height: 190px; aspect-ratio: 16 / 9; }

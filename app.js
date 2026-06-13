@@ -152,6 +152,29 @@ function showToast(message) {
   clearTimeout(showToast.timer); showToast.timer=setTimeout(()=>toast.classList.remove("show"),2200);
 }
 
+function mealVisual(name="",type="") {
+  const value=name.toLowerCase();
+  if(/curry|tikka|masala/.test(value))return {icon:"🍛",theme:"curry"};
+  if(/pasta|spaghetti|bolognese|lasagne|noodle/.test(value))return {icon:"🍝",theme:"pasta"};
+  if(/salmon|fish|tuna|cod|shrimp|prawn|seafood/.test(value))return {icon:"🐟",theme:"seafood"};
+  if(/taco|burrito|quesadilla|nacho/.test(value))return {icon:"🌮",theme:"taco"};
+  if(/soup|stew|broth/.test(value))return {icon:"🥣",theme:"soup"};
+  if(/salad|bowl|quinoa/.test(value))return {icon:"🥗",theme:"salad"};
+  if(/pancake|waffle|crepe/.test(value))return {icon:"🥞",theme:"pancake"};
+  if(/oat|porridge|granola|cereal/.test(value))return {icon:"🥣",theme:"breakfast"};
+  if(/pizza/.test(value))return {icon:"🍕",theme:"pizza"};
+  if(/burger|sandwich|wrap/.test(value))return {icon:"🥪",theme:"sandwich"};
+  if(/chicken|turkey/.test(value))return {icon:"🍗",theme:"protein"};
+  if(/beef|steak|meat/.test(value))return {icon:"🥩",theme:"protein"};
+  if(/rice|risotto/.test(value))return {icon:"🍚",theme:"rice"};
+  if(/cake|cookie|brownie|dessert|ice cream/.test(value))return {icon:"🍰",theme:"dessert"};
+  if(/fruit|smoothie|berry/.test(value))return {icon:"🍓",theme:"fruit"};
+  if(type==="Breakfast")return {icon:"🍳",theme:"breakfast"};
+  if(type==="Lunch")return {icon:"🥙",theme:"lunch"};
+  if(type==="Snack")return {icon:"🍎",theme:"snack"};
+  return {icon:"🍽️",theme:"dinner"};
+}
+
 function renderWeek() {
   const end=addDays(currentWeek,6);
   $("#weekRange").textContent=formatRange(currentWeek,end);
@@ -160,7 +183,8 @@ function renderWeek() {
     const date=addDays(currentWeek,i), key=dateKey(date);
     const slots=TYPES.map(type=>{
       const meal=state.meals[mealKey(key,type)];
-      return `<div class="meal-slot ${meal?"filled":""}" data-type="${type}"><span class="slot-label">${type}</span>${meal?`<button class="meal-card" data-view-meal="${key}|${type}"><strong>${escapeHtml(meal.name)}</strong><small>${escapeHtml(meal.time||"")} · ${meal.servings||4} servings</small></button>`:`<button class="add-slot" data-add-date="${key}" data-add-type="${type}" aria-label="Add ${type}">＋</button>`}</div>`;
+      const visual=meal?mealVisual(meal.name,type):null;
+      return `<div class="meal-slot ${meal?`filled meal-theme-${visual.theme}`:""}" data-type="${type}"><span class="slot-label">${type}</span>${meal?`<button class="meal-card" data-view-meal="${key}|${type}"><span class="meal-card-icon" aria-hidden="true">${visual.icon}</span><span class="meal-card-copy"><strong>${escapeHtml(meal.name)}</strong><small>${escapeHtml(meal.time||"")} · ${meal.servings||4} servings</small></span></button>`:`<button class="add-slot" data-add-date="${key}" data-add-type="${type}" aria-label="Add ${type}">＋</button>`}</div>`;
     }).join("");
     return `<div class="day-column"><div class="day-header ${key===today?"today":""}"><span class="day-name">${date.toLocaleDateString(undefined,{weekday:"short"}).toUpperCase()}</span><span class="day-number">${date.getDate()}</span></div>${slots}</div>`;
   }).join("");
@@ -173,7 +197,7 @@ function renderMonth() {
   const today=dateKey(new Date());
   $("#monthGrid").innerHTML=Array.from({length:42},(_,i)=>{
     const date=addDays(gridStart,i), key=dateKey(date), dayMeals=TYPES.map(type=>state.meals[mealKey(key,type)]).filter(Boolean);
-    return `<div class="month-day ${date.getMonth()!==currentMonth.getMonth()?"outside":""} ${key===today?"today":""}"><span class="month-num">${date.getDate()}</span>${dayMeals.slice(0,4).map(meal=>`<button class="month-meal" data-type="${meal.type}" data-view-meal="${meal.date}|${meal.type}" title="${escapeHtml(meal.name)}">${escapeHtml(meal.name)}</button>`).join("")}<button class="month-add" data-add-date="${key}" data-add-type="Dinner">＋</button></div>`;
+    return `<div class="month-day ${date.getMonth()!==currentMonth.getMonth()?"outside":""} ${key===today?"today":""}"><span class="month-num">${date.getDate()}</span>${dayMeals.slice(0,4).map(meal=>{const visual=mealVisual(meal.name,meal.type);return `<button class="month-meal meal-theme-${visual.theme}" data-type="${meal.type}" data-view-meal="${meal.date}|${meal.type}" title="${escapeHtml(meal.name)}"><span aria-hidden="true">${visual.icon}</span> ${escapeHtml(meal.name)}</button>`;}).join("")}<button class="month-add" data-add-date="${key}" data-add-type="Dinner">＋</button></div>`;
   }).join("");
 }
 
@@ -319,7 +343,10 @@ function renderRecipeDetail() {
   }
   const date=parseDate(meal.date),fallbackVideo=recipeFor(meal.name).video,videoId=youtubeVideoId(meal.video)||youtubeVideoId(fallbackVideo);
   $("#detailEyebrow").textContent=`${meal.type} · ${date.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"})}`;
+  const visual=mealVisual(meal.name,meal.type);
   $("#detailMealName").textContent=meal.name;
+  $("#detailMealIcon").textContent=visual.icon;
+  $("#detailMealIcon").className=`detail-meal-icon meal-theme-${visual.theme}`;
   $("#detailDescription").textContent=meal.description||"A meal from your plan.";
   $("#detailMeta").innerHTML=`<span>◷ ${escapeHtml(meal.time||"Time not set")}</span><span>♙ ${meal.servings||4} servings</span><span>⌑ ${(meal.ingredients||[]).length} ingredients</span>`;
   $("#detailVideo").innerHTML=videoId
