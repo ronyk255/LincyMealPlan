@@ -4,7 +4,11 @@ A responsive, installable meal-planning web app with weekly and monthly views, e
 
 ## Run locally
 
-Open `index.html`, or serve the folder with any static file server.
+Run `npm start`, then open `http://localhost:8765`. Node.js 22.5 or newer is required.
+
+The server creates `lincy.sqlite` automatically. Create the first user and kitchen, then use the displayed invite code when creating a second account. Both accounts share one household plan.
+
+The GitHub Pages deployment runs in static mode and saves plans in that browser. Shared accounts require the Node server because GitHub Pages cannot run server-side code or SQLite.
 
 ## Features
 
@@ -14,6 +18,7 @@ Open `index.html`, or serve the folder with any static file server.
 - Editable ingredients, instructions, servings, and video links
 - Week or month shopping-list aggregation
 - Repeated-meal and plan-coverage insights
-- Local browser persistence and offline PWA support
+- SQLite-backed user accounts and shared household persistence
+- Local browser cache and offline PWA support
 
 The current recipe generator is deterministic and runs entirely in the browser. It is intentionally structured so a hosted AI/API endpoint can replace `generateRecipe()` later without changing the planner UI.

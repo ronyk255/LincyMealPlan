@@ -136,10 +136,25 @@ let editingKey = null;
 let editingShoppingId = null;
 let clearPlanContext = "week";
 let viewingMealKey = null;
+let account = null;
+let authMode = "login";
+let syncTimer = null;
+let staticMode = false;
 
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
-const save = () => localStorage.setItem(STORE_KEY,JSON.stringify(state));
+const save = () => {
+  localStorage.setItem(STORE_KEY,JSON.stringify(state));
+  if(!account)return;
+  clearTimeout(syncTimer);
+  syncTimer=setTimeout(async()=>{
+    try{
+      const response=await fetch("/api/plan",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({state})});
+      if(!response.ok)throw new Error();
+    }catch{showToast("Saved on this device; shared sync is offline");}
+    finally{syncTimer=null;}
+  },250);
+};
 const formatRange = (start,end) => `${start.toLocaleDateString(undefined,{month:"short",day:"numeric"})} – ${end.toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"})}`;
 const mealKey = (date,type) => `${date}|${type}`;
 
@@ -176,9 +191,7 @@ function mealVisual(name="",type="") {
 }
 
 function renderWeek() {
-  const end=addDays(currentWeek,6);
-  $("#weekRange").textContent=formatRange(currentWeek,end);
-  const today=dateKey(new Date());
+  $("#weekRange").textContent=currentWeek.toLocaleDateString(undefined,{month:"long",year:"numeric"});
   $("#weekGrid").innerHTML=Array.from({length:7},(_,i)=>{
     const date=addDays(currentWeek,i), key=dateKey(date);
     const slots=TYPES.map(type=>{
@@ -186,7 +199,7 @@ function renderWeek() {
       const visual=meal?mealVisual(meal.name,type):null;
       return `<div class="meal-slot ${meal?`filled meal-theme-${visual.theme}`:""}" data-type="${type}"><span class="slot-label">${type}</span>${meal?`<button class="meal-card" data-view-meal="${key}|${type}"><span class="meal-card-icon" aria-hidden="true">${visual.icon}</span><span class="meal-card-copy"><strong>${escapeHtml(meal.name)}</strong><small>${escapeHtml(meal.time||"")} · ${meal.servings||4} servings</small></span></button>`:`<button class="add-slot" data-add-date="${key}" data-add-type="${type}" aria-label="Add ${type}">＋</button>`}</div>`;
     }).join("");
-    return `<div class="day-column"><div class="day-header ${key===today?"today":""}"><span class="day-name">${date.toLocaleDateString(undefined,{weekday:"short"}).toUpperCase()}</span><span class="day-number">${date.getDate()}</span></div>${slots}</div>`;
+    return `<div class="day-column"><div class="day-header"><span class="day-sticker">${["☀️","🥪","🍲","🥗","🌮","🥞","🍝"][i]}</span><span class="day-number">Day ${i+1}</span></div>${slots}</div>`;
   }).join("");
   renderSidebars();
 }
@@ -194,10 +207,12 @@ function renderWeek() {
 function renderMonth() {
   $("#monthRange").textContent=currentMonth.toLocaleDateString(undefined,{month:"long",year:"numeric"});
   const gridStart=startOfWeek(new Date(currentMonth.getFullYear(),currentMonth.getMonth(),1));
-  const today=dateKey(new Date());
-  $("#monthGrid").innerHTML=Array.from({length:42},(_,i)=>{
-    const date=addDays(gridStart,i), key=dateKey(date), dayMeals=TYPES.map(type=>state.meals[mealKey(key,type)]).filter(Boolean);
-    return `<div class="month-day ${date.getMonth()!==currentMonth.getMonth()?"outside":""} ${key===today?"today":""}"><span class="month-num">${date.getDate()}</span>${dayMeals.slice(0,4).map(meal=>{const visual=mealVisual(meal.name,meal.type);return `<button class="month-meal meal-theme-${visual.theme}" data-type="${meal.type}" data-view-meal="${meal.date}|${meal.type}" title="${escapeHtml(meal.name)}"><span aria-hidden="true">${visual.icon}</span> ${escapeHtml(meal.name)}</button>`;}).join("")}<button class="month-add" data-add-date="${key}" data-add-type="Dinner">＋</button></div>`;
+  $("#monthGrid").innerHTML=Array.from({length:6},(_,week)=>{
+    const days=Array.from({length:7},(_,day)=>{
+      const date=addDays(gridStart,week*7+day),key=dateKey(date),dayMeals=TYPES.map(type=>state.meals[mealKey(key,type)]).filter(Boolean);
+      return `<div class="month-day ${date.getMonth()!==currentMonth.getMonth()?"outside":""}">${dayMeals.slice(0,4).map(meal=>{const visual=mealVisual(meal.name,meal.type);return `<button class="month-meal meal-theme-${visual.theme}" data-type="${meal.type}" data-view-meal="${meal.date}|${meal.type}" title="${escapeHtml(meal.name)}"><span aria-hidden="true">${visual.icon}</span> ${escapeHtml(meal.name)}</button>`;}).join("")}<button class="month-add" data-add-date="${key}" data-add-type="Dinner">＋</button></div>`;
+    }).join("");
+    return `<div class="month-week-label"><span>Week</span><strong>${week+1}</strong></div>${days}`;
   }).join("");
 }
 
@@ -544,5 +559,50 @@ $("#globalSearch").addEventListener("input",event=>{const q=event.target.value.t
 document.addEventListener("keydown",event=>{if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==="k"){event.preventDefault();$("#globalSearch").focus();}});
 
 function renderSettings(){const units=state.settings.units==="metric"?"metric":"imperial";$("#profileRegion").textContent=`${state.settings.region} · ${units}`;}
-renderSettings(); renderWeek();
+function setAuthMode(mode){
+  authMode=mode;const registering=mode==="register";
+  $("#authTitle").textContent=registering?"Create your kitchen account":"Log in to your kitchen";
+  $("#authSubmit").textContent=registering?"Create account":"Log in";
+  $("#authName").closest("label").classList.toggle("hidden",!registering);
+  $("#householdFields").classList.toggle("hidden",!registering);
+  $("#authPassword").autocomplete=registering?"new-password":"current-password";
+  $$('[data-auth-mode]').forEach(button=>button.classList.toggle("active",button.dataset.authMode===mode));
+  $("#authError").textContent="";
+}
+function renderAccount(){
+  if(!account)return;
+  $("#profileName").textContent=account.user.name;
+  $(".avatar").textContent=account.user.name.split(/\s+/).map(value=>value[0]).join("").slice(0,2).toUpperCase();
+  $("#householdName").textContent=account.household.name;
+  $("#householdCode").textContent=`Invite code: ${account.household.inviteCode}`;
+}
+async function loadAccount(){
+  try{
+    const response=await fetch("/api/plan",{cache:"no-store"});
+    if(response.status===404){
+      staticMode=true;
+      $("#profileName").textContent="My kitchen";
+      $("#profileRegion").textContent=`${state.settings.region} · local saves`;
+      return;
+    }
+    if(!response.ok)throw new Error();
+    const data=await response.json();account={user:data.user,household:data.household};state=data.state;
+    state.meals||={};state.settings||={region:"Sweden",units:"metric"};state.checked||={};state.shoppingOverrides||={};state.recipeChecks||={};
+    localStorage.setItem(STORE_KEY,JSON.stringify(state));renderSettings();renderAccount();renderAll();
+    if($("#authDialog").open)$("#authDialog").close();
+  }catch{setAuthMode("login");if(!$("#authDialog").open)$("#authDialog").showModal();}
+}
+$$('[data-auth-mode]').forEach(button=>button.onclick=()=>setAuthMode(button.dataset.authMode));
+$("#authForm").addEventListener("submit",async event=>{
+  event.preventDefault();$("#authError").textContent="";$("#authSubmit").disabled=true;
+  const payload={name:$("#authName").value.trim(),email:$("#authEmail").value.trim(),password:$("#authPassword").value,householdName:$("#authHousehold").value.trim(),inviteCode:$("#authInvite").value.trim()};
+  try{
+    const response=await fetch(`/api/${authMode}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)}),data=await response.json();
+    if(!response.ok)throw new Error(data.error);await loadAccount();showToast(authMode==="register"?"Kitchen account created":"Welcome back");
+  }catch(error){$("#authError").textContent=error.message||"Could not connect to the kitchen database.";}finally{$("#authSubmit").disabled=false;}
+});
+$("#authDialog").addEventListener("cancel",event=>event.preventDefault());
+$("#logoutButton").onclick=async()=>{if(staticMode){$("#settingsDialog").close();showToast("Accounts are available on the hosted server version");return;}await fetch("/api/logout",{method:"POST"});account=null;$("#settingsDialog").close();setAuthMode("login");$("#authDialog").showModal();};
+window.addEventListener("focus",()=>{if(account&&!syncTimer)loadAccount();});
+renderSettings(); renderWeek(); loadAccount();
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js",{updateViaCache:"none"}).then(registration=>registration.update()).catch(()=>{}));
