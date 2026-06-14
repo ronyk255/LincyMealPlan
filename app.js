@@ -1,4 +1,5 @@
 const TYPES = ["Breakfast", "Lunch", "Dinner", "Snack"];
+const TYPE_ICONS = {Breakfast:"🍳",Lunch:"🥪",Dinner:"🍽️",Snack:"🍎"};
 const STORE_KEY = "lincy-meal-planner-v1";
 const pad = value => String(value).padStart(2, "0");
 const dateKey = date => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
@@ -218,7 +219,7 @@ function renderMonth() {
   $("#monthGrid").innerHTML=Array.from({length:6},(_,week)=>{
     const days=Array.from({length:7},(_,day)=>{
       const date=addDays(gridStart,week*7+day),key=dateKey(date),dayMeals=TYPES.map(type=>state.meals[mealKey(key,type)]).filter(Boolean);
-      return `<div class="month-day ${date.getMonth()!==currentMonth.getMonth()?"outside":""}">${dayMeals.slice(0,4).map(meal=>{const visual=mealVisual(meal.name,meal.type);return `<button class="month-meal meal-theme-${visual.theme}" data-type="${meal.type}" data-view-meal="${meal.date}|${meal.type}" title="${escapeHtml(meal.name)}"><span aria-hidden="true">${visual.icon}</span> ${escapeHtml(meal.name)}</button>`;}).join("")}<button class="month-add" data-add-date="${key}" data-add-type="Dinner">＋</button></div>`;
+      return `<div class="month-day ${date.getMonth()!==currentMonth.getMonth()?"outside":""}">${dayMeals.slice(0,4).map(meal=>{const visual=mealVisual(meal.name,meal.type);return `<button class="month-meal meal-theme-${visual.theme}" data-type="${meal.type}" data-view-meal="${meal.date}|${meal.type}" title="${escapeHtml(meal.type)}: ${escapeHtml(meal.name)}"><span class="month-meal-type"><span aria-hidden="true">${TYPE_ICONS[meal.type]||"🍽️"}</span>${escapeHtml(meal.type)}</span><strong>${escapeHtml(meal.name)}</strong></button>`;}).join("")}<button class="month-add" data-add-date="${key}" data-add-type="Dinner">＋</button></div>`;
     }).join("");
     return `<div class="month-week-label"><span>Week</span><strong>${week+1}</strong></div>${days}`;
   }).join("");
