@@ -147,6 +147,7 @@ let authMode = "login";
 let syncTimer = null;
 let staticMode = false;
 let editingUserId = null;
+let previewOnly = false;
 
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
@@ -577,6 +578,22 @@ function setAuthMode(mode){
   $$('[data-auth-mode]').forEach(button=>button.classList.toggle("active",button.dataset.authMode===mode));
   $("#authError").textContent="";
 }
+function showLogin(){
+  if(previewOnly){
+    $("#authTitle").textContent="This link is a preview";
+    $("#authError").textContent="Login is unavailable on GitHub Pages because it cannot run the account database. Open the hosted server URL to log in as Rony.";
+  }else setAuthMode("login");
+  if(!$("#authDialog").open)$("#authDialog").showModal();
+}
+function enterPreviewMode(){
+  staticMode=true;previewOnly=true;document.body.classList.add("preview-only");
+  $("#profileName").textContent="Preview mode";$("#profileRegion").textContent="Read-only · login server required";
+  $("#authTitle").textContent="This link is a preview";$("#authError").textContent="Login is unavailable on GitHub Pages because it cannot run the account database. Open the hosted server URL to log in as Rony.";
+  $("#authSubmit").classList.add("hidden");$("#previewContinue").classList.remove("hidden");
+  [$("#authUsername"),$("#authPassword")].forEach(input=>input.disabled=true);
+  $$('[data-auth-mode]').forEach(button=>button.disabled=true);
+  if(!$("#authDialog").open)$("#authDialog").showModal();
+}
 function renderAccount(){
   if(!account)return;
   $("#profileName").textContent=account.user.name;
@@ -596,9 +613,7 @@ async function loadAccount(){
   try{
     const response=await fetch("/api/plan",{cache:"no-store"});
     if(response.status===404){
-      staticMode=true;
-      $("#profileName").textContent="My kitchen";
-      $("#profileRegion").textContent=`${state.settings.region} · local saves`;
+      enterPreviewMode();
       return;
     }
     if(!response.ok)throw new Error();
@@ -606,7 +621,7 @@ async function loadAccount(){
     state.meals||={};state.settings||={region:"Sweden",units:"metric"};state.checked||={};state.shoppingOverrides||={};state.recipeChecks||={};
     localStorage.setItem(STORE_KEY,JSON.stringify(state));renderSettings();renderAccount();renderAll();
     if($("#authDialog").open)$("#authDialog").close();
-  }catch{setAuthMode("login");if(!$("#authDialog").open)$("#authDialog").showModal();}
+  }catch{showLogin();}
 }
 $$('[data-auth-mode]').forEach(button=>button.onclick=()=>setAuthMode(button.dataset.authMode));
 $("#authForm").addEventListener("submit",async event=>{
@@ -618,6 +633,12 @@ $("#authForm").addEventListener("submit",async event=>{
   }catch(error){$("#authError").textContent=error.message||"Could not connect to the kitchen database.";}finally{$("#authSubmit").disabled=false;}
 });
 $("#authDialog").addEventListener("cancel",event=>event.preventDefault());
+$("#previewContinue").onclick=()=>{$("#authDialog").close();};
+document.addEventListener("click",event=>{
+  if(!previewOnly)return;
+  const blocked=event.target.closest("[data-add-date],[data-view-meal],[data-open-clear-plan],[data-clear-scope],[data-check],[data-edit-shopping],[data-delete-shopping],[data-add-shopping],#quickAddButton,#addShoppingItem,#profileButton,#saveSettings");
+  if(blocked){event.preventDefault();event.stopImmediatePropagation();showLogin();}
+},true);
 function closeCreateUser(){if($("#createUserDialog").open)$("#createUserDialog").close();}
 function openUserForm(user=null){
   editingUserId=user?.id||null;$("#createUserForm").reset();$("#setupResult").classList.add("hidden");$("#createUserError").textContent="";$("#createUserSubmit").classList.remove("hidden");
@@ -648,9 +669,9 @@ window.addEventListener("focus",()=>{if(account&&!syncTimer)loadAccount();});
 renderSettings(); renderWeek(); loadAccount();
 if("serviceWorker" in navigator){
   navigator.serviceWorker.addEventListener("controllerchange",()=>{
-    if(sessionStorage.getItem("lincy-worker-reloaded")==="17")return;
-    sessionStorage.setItem("lincy-worker-reloaded","17");
+    if(sessionStorage.getItem("lincy-worker-reloaded")==="18")return;
+    sessionStorage.setItem("lincy-worker-reloaded","18");
     window.location.reload();
   });
-  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=17",{updateViaCache:"none"}).then(registration=>registration.update()).catch(()=>{}));
+  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=18",{updateViaCache:"none"}).then(registration=>registration.update()).catch(()=>{}));
 }
