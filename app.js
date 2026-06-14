@@ -140,6 +140,7 @@ let account = null;
 let authMode = "login";
 let syncTimer = null;
 let staticMode = false;
+let editingUserId = null;
 
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
@@ -580,7 +581,7 @@ async function loadUsers(){
   if(!account?.user.isAdmin)return;
   try{
     const response=await fetch("/api/users",{cache:"no-store"}),data=await response.json();if(!response.ok)throw new Error(data.error);
-    $("#userList").innerHTML=data.users.map(user=>`<div class="user-row"><span class="user-avatar">${escapeHtml(user.name.slice(0,1).toUpperCase())}</span><span><strong>${escapeHtml(user.name)}</strong><small>@${escapeHtml(user.username)}${user.pending?" · Password not set":""}</small></span>${user.isAdmin?"<b>Admin</b>":""}</div>`).join("");
+    $("#userList").innerHTML=data.users.map(user=>`<div class="user-row"><span class="user-avatar">${escapeHtml(user.name.slice(0,1).toUpperCase())}</span><span><strong>${escapeHtml(user.name)}</strong><small>@${escapeHtml(user.username)}${user.pending?" · Password not set":""}</small></span>${user.isAdmin?"<b>Admin</b>":`<button type="button" class="user-edit" data-edit-user="${user.id}" data-user-name="${escapeHtml(user.name)}" data-username="${escapeHtml(user.username)}">Edit</button>`}</div>`).join("");
   }catch(error){showToast(error.message||"Could not load users");}
 }
 async function loadAccount(){
@@ -610,13 +611,21 @@ $("#authForm").addEventListener("submit",async event=>{
 });
 $("#authDialog").addEventListener("cancel",event=>event.preventDefault());
 function closeCreateUser(){if($("#createUserDialog").open)$("#createUserDialog").close();}
-$("#openCreateUser").onclick=()=>{$("#createUserForm").reset();$("#setupResult").classList.add("hidden");$("#createUserError").textContent="";$("#createUserSubmit").classList.remove("hidden");$("#createUserDialog").showModal();};
+function openUserForm(user=null){
+  editingUserId=user?.id||null;$("#createUserForm").reset();$("#setupResult").classList.add("hidden");$("#createUserError").textContent="";$("#createUserSubmit").classList.remove("hidden");
+  $("#userFormTitle").textContent=user?"Edit kitchen user":"Create kitchen user";$("#createUserSubmit").textContent=user?"Save changes":"Create user";
+  $("#userFormNote").textContent=user?"Changing the name or username keeps this user's password, permissions and saved kitchen access intact.":"Lincy will generate a one-time setup code. Give the username and code to the user so they can choose their own password.";
+  if(user){$("#newUserName").value=user.name;$("#newUserUsername").value=user.username;}
+  $("#createUserDialog").showModal();
+}
+$("#openCreateUser").onclick=()=>openUserForm();
+$("#userList").addEventListener("click",event=>{const button=event.target.closest("[data-edit-user]");if(button)openUserForm({id:Number(button.dataset.editUser),name:button.dataset.userName,username:button.dataset.username});});
 $("#closeCreateUser").onclick=closeCreateUser;$("#cancelCreateUser").onclick=closeCreateUser;
 $("#createUserForm").addEventListener("submit",async event=>{
   event.preventDefault();$("#createUserError").textContent="";$("#createUserSubmit").disabled=true;
   try{
-    const response=await fetch("/api/users",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:$("#newUserName").value.trim(),username:$("#newUserUsername").value.trim()})}),data=await response.json();if(!response.ok)throw new Error(data.error);
-    $("#createdUsername").textContent=`Username: ${data.user.username}`;$("#createdSetupCode").textContent=`Setup code: ${data.setupCode}`;$("#setupResult").classList.remove("hidden");$("#createUserSubmit").classList.add("hidden");loadUsers();
+    const payload={name:$("#newUserName").value.trim(),username:$("#newUserUsername").value.trim()},response=await fetch(editingUserId?`/api/users/${editingUserId}`:"/api/users",{method:editingUserId?"PATCH":"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)}),data=await response.json();if(!response.ok)throw new Error(data.error);
+    if(editingUserId){closeCreateUser();showToast(`User renamed to ${data.user.name}`);}else{$("#createdUsername").textContent=`Username: ${data.user.username}`;$("#createdSetupCode").textContent=`Setup code: ${data.setupCode}`;$("#setupResult").classList.remove("hidden");$("#createUserSubmit").classList.add("hidden");}loadUsers();
   }catch(error){$("#createUserError").textContent=error.message||"Could not create user.";}finally{$("#createUserSubmit").disabled=false;}
 });
 function closePasswordDialog(){if($("#passwordDialog").open)$("#passwordDialog").close();}

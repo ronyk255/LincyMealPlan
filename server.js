@@ -57,6 +57,18 @@ async function api(req,res,url){
     if(db.prepare("SELECT id FROM users WHERE username=?").get(username))return json(res,409,{error:"That username is already in use."});
     const code=setupCode(),salt=crypto.randomBytes(16).toString("hex");db.prepare("INSERT INTO users(household_id,name,email,password_hash,salt,username,is_admin,setup_token_hash) VALUES(?,?,?,?,?,?,0,?)").run(user.household_id,name,`${username}@local.lincy`,hash(crypto.randomBytes(32).toString("hex"),salt),salt,username,tokenHash(code));return json(res,201,{user:{name,username},setupCode:code});
   }
+  const userMatch=url.pathname.match(/^\/api\/users\/(\d+)$/);
+  if(req.method==="PATCH"&&userMatch){
+    if(!user.is_admin)return json(res,403,{error:"Admin access is required."});
+    const target=db.prepare("SELECT id,is_admin FROM users WHERE id=? AND household_id=?").get(Number(userMatch[1]),user.household_id);
+    if(!target)return json(res,404,{error:"User not found."});
+    if(target.is_admin)return json(res,403,{error:"Administrator accounts cannot be renamed here."});
+    const data=await body(req),name=String(data.name||"").trim(),username=String(data.username||"").trim().toLowerCase();
+    if(!name||!validUsername(username))return json(res,400,{error:"Enter a name and a 3-30 character username using letters, numbers, dots, dashes or underscores."});
+    if(db.prepare("SELECT id FROM users WHERE username=? AND id<>?").get(username,target.id))return json(res,409,{error:"That username is already in use."});
+    db.prepare("UPDATE users SET name=?,username=?,email=? WHERE id=?").run(name,username,`${username}@local.lincy`,target.id);
+    return json(res,200,{user:{id:target.id,name,username}});
+  }
   if(req.method==="POST"&&url.pathname==="/api/change-password"){
     const data=await body(req),current=String(data.currentPassword||""),next=String(data.newPassword||""),stored=db.prepare("SELECT * FROM users WHERE id=?").get(user.id);
     if(hash(current,stored.salt)!==stored.password_hash)return json(res,401,{error:"Current password is incorrect."});if(next.length<8)return json(res,400,{error:"New password must have at least 8 characters."});

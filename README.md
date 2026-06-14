@@ -8,7 +8,7 @@ Run `npm start`, then open `http://localhost:8765`. Node.js 22.5 or newer is req
 
 The server creates `lincy.sqlite` automatically and seeds `rony` as the administrator. On first startup, the terminal prints Rony's one-time setup code. Use **Set first password** to choose the admin password.
 
-Only an administrator can create additional kitchen users. Each new account receives a one-time setup code so the user can privately choose their own password.
+Only an administrator can create or rename additional kitchen users. Each new account receives a one-time setup code so the user can privately choose their own password. Renaming a user keeps their password and household access intact.
 
 The GitHub Pages deployment runs in static mode and saves plans in that browser. Shared accounts require the Node server because GitHub Pages cannot run server-side code or SQLite.
 
