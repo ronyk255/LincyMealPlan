@@ -546,7 +546,7 @@ $("#recipeDetailDialog").addEventListener("close",()=>{viewingMealKey=null;$("#d
 $("#editDetailMeal").onclick=()=>editViewedMeal(); $("#editDetailIngredients").onclick=()=>editViewedMeal("#mealIngredients");
 $("#deleteMeal").onclick=()=>{if(editingKey){delete state.meals[editingKey];delete state.recipeChecks[editingKey];save();$("#mealDialog").close();renderAll();showToast("Meal removed");}};
 $("#menuButton").onclick=()=>$("#sidebar").classList.toggle("open");
-$("#profileButton").onclick=()=>{$("#regionSelect").value=state.settings.region;$("#unitSelect").value=state.settings.units;$("#settingsDialog").showModal();};
+$("#profileButton").onclick=()=>{$("#regionSelect").value=state.settings.region;$("#unitSelect").value=state.settings.units;$("#settingsDialog").showModal();if(account?.user.isAdmin)loadUsers();};
 $("#saveSettings").onclick=()=>{state.settings={region:$("#regionSelect").value,units:$("#unitSelect").value};save();renderSettings();showToast("Kitchen preferences saved");};
 $("#copyList").onclick=async()=>{const data=shoppingData(),text=Object.entries(data).map(([category,group])=>`${category}\n${Object.values(group).map(item=>`- ${[item.quantity,item.unit,item.name].filter(Boolean).join(" ")}`).join("\n")}`).join("\n\n");try{await navigator.clipboard.writeText(text);showToast("Shopping list copied");}catch{showToast("Copy is unavailable in this browser");}};
 $("#addShoppingItem").onclick=()=>openShoppingItem(); $("#saveShoppingItem").onclick=saveShoppingItem;
@@ -560,12 +560,11 @@ document.addEventListener("keydown",event=>{if((event.ctrlKey||event.metaKey)&&e
 
 function renderSettings(){const units=state.settings.units==="metric"?"metric":"imperial";$("#profileRegion").textContent=`${state.settings.region} · ${units}`;}
 function setAuthMode(mode){
-  authMode=mode;const registering=mode==="register";
-  $("#authTitle").textContent=registering?"Create your kitchen account":"Log in to your kitchen";
-  $("#authSubmit").textContent=registering?"Create account":"Log in";
-  $("#authName").closest("label").classList.toggle("hidden",!registering);
-  $("#householdFields").classList.toggle("hidden",!registering);
-  $("#authPassword").autocomplete=registering?"new-password":"current-password";
+  authMode=mode;const activating=mode==="activate";
+  $("#authTitle").textContent=activating?"Choose your private password":"Log in to your kitchen";
+  $("#authSubmit").textContent=activating?"Set password and log in":"Log in";
+  $("#setupCodeLabel").classList.toggle("hidden",!activating);
+  $("#authPassword").autocomplete=activating?"new-password":"current-password";
   $$('[data-auth-mode]').forEach(button=>button.classList.toggle("active",button.dataset.authMode===mode));
   $("#authError").textContent="";
 }
@@ -574,7 +573,15 @@ function renderAccount(){
   $("#profileName").textContent=account.user.name;
   $(".avatar").textContent=account.user.name.split(/\s+/).map(value=>value[0]).join("").slice(0,2).toUpperCase();
   $("#householdName").textContent=account.household.name;
-  $("#householdCode").textContent=`Invite code: ${account.household.inviteCode}`;
+  $("#accountRole").textContent=account.user.isAdmin?`@${account.user.username} · Administrator`:`@${account.user.username} · Kitchen member`;
+  $("#adminPanel").classList.toggle("hidden",!account.user.isAdmin);
+}
+async function loadUsers(){
+  if(!account?.user.isAdmin)return;
+  try{
+    const response=await fetch("/api/users",{cache:"no-store"}),data=await response.json();if(!response.ok)throw new Error(data.error);
+    $("#userList").innerHTML=data.users.map(user=>`<div class="user-row"><span class="user-avatar">${escapeHtml(user.name.slice(0,1).toUpperCase())}</span><span><strong>${escapeHtml(user.name)}</strong><small>@${escapeHtml(user.username)}${user.pending?" · Password not set":""}</small></span>${user.isAdmin?"<b>Admin</b>":""}</div>`).join("");
+  }catch(error){showToast(error.message||"Could not load users");}
 }
 async function loadAccount(){
   try{
@@ -595,13 +602,30 @@ async function loadAccount(){
 $$('[data-auth-mode]').forEach(button=>button.onclick=()=>setAuthMode(button.dataset.authMode));
 $("#authForm").addEventListener("submit",async event=>{
   event.preventDefault();$("#authError").textContent="";$("#authSubmit").disabled=true;
-  const payload={name:$("#authName").value.trim(),email:$("#authEmail").value.trim(),password:$("#authPassword").value,householdName:$("#authHousehold").value.trim(),inviteCode:$("#authInvite").value.trim()};
+  const payload={username:$("#authUsername").value.trim(),setupCode:$("#authSetupCode").value.trim(),password:$("#authPassword").value};
   try{
     const response=await fetch(`/api/${authMode}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)}),data=await response.json();
-    if(!response.ok)throw new Error(data.error);await loadAccount();showToast(authMode==="register"?"Kitchen account created":"Welcome back");
+    if(!response.ok)throw new Error(data.error);await loadAccount();showToast(authMode==="activate"?"Password set. Welcome to the kitchen":"Welcome back");
   }catch(error){$("#authError").textContent=error.message||"Could not connect to the kitchen database.";}finally{$("#authSubmit").disabled=false;}
 });
 $("#authDialog").addEventListener("cancel",event=>event.preventDefault());
+function closeCreateUser(){if($("#createUserDialog").open)$("#createUserDialog").close();}
+$("#openCreateUser").onclick=()=>{$("#createUserForm").reset();$("#setupResult").classList.add("hidden");$("#createUserError").textContent="";$("#createUserSubmit").classList.remove("hidden");$("#createUserDialog").showModal();};
+$("#closeCreateUser").onclick=closeCreateUser;$("#cancelCreateUser").onclick=closeCreateUser;
+$("#createUserForm").addEventListener("submit",async event=>{
+  event.preventDefault();$("#createUserError").textContent="";$("#createUserSubmit").disabled=true;
+  try{
+    const response=await fetch("/api/users",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:$("#newUserName").value.trim(),username:$("#newUserUsername").value.trim()})}),data=await response.json();if(!response.ok)throw new Error(data.error);
+    $("#createdUsername").textContent=`Username: ${data.user.username}`;$("#createdSetupCode").textContent=`Setup code: ${data.setupCode}`;$("#setupResult").classList.remove("hidden");$("#createUserSubmit").classList.add("hidden");loadUsers();
+  }catch(error){$("#createUserError").textContent=error.message||"Could not create user.";}finally{$("#createUserSubmit").disabled=false;}
+});
+function closePasswordDialog(){if($("#passwordDialog").open)$("#passwordDialog").close();}
+$("#changePasswordButton").onclick=()=>{if(staticMode){showToast("Accounts are available on the hosted server version");return;}$("#passwordForm").reset();$("#passwordError").textContent="";$("#passwordDialog").showModal();};
+$("#closePasswordDialog").onclick=closePasswordDialog;$("#cancelPassword").onclick=closePasswordDialog;
+$("#passwordForm").addEventListener("submit",async event=>{
+  event.preventDefault();$("#passwordError").textContent="";
+  try{const response=await fetch("/api/change-password",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({currentPassword:$("#currentPassword").value,newPassword:$("#newPassword").value})}),data=await response.json();if(!response.ok)throw new Error(data.error);closePasswordDialog();showToast("Password updated");}catch(error){$("#passwordError").textContent=error.message||"Could not change password.";}
+});
 $("#logoutButton").onclick=async()=>{if(staticMode){$("#settingsDialog").close();showToast("Accounts are available on the hosted server version");return;}await fetch("/api/logout",{method:"POST"});account=null;$("#settingsDialog").close();setAuthMode("login");$("#authDialog").showModal();};
 window.addEventListener("focus",()=>{if(account&&!syncTimer)loadAccount();});
 renderSettings(); renderWeek(); loadAccount();

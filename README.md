@@ -6,7 +6,9 @@ A responsive, installable meal-planning web app with weekly and monthly views, e
 
 Run `npm start`, then open `http://localhost:8765`. Node.js 22.5 or newer is required.
 
-The server creates `lincy.sqlite` automatically. Create the first user and kitchen, then use the displayed invite code when creating a second account. Both accounts share one household plan.
+The server creates `lincy.sqlite` automatically and seeds `rony` as the administrator. On first startup, the terminal prints Rony's one-time setup code. Use **Set first password** to choose the admin password.
+
+Only an administrator can create additional kitchen users. Each new account receives a one-time setup code so the user can privately choose their own password.
 
 The GitHub Pages deployment runs in static mode and saves plans in that browser. Shared accounts require the Node server because GitHub Pages cannot run server-side code or SQLite.
 

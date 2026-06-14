@@ -155,21 +155,28 @@
   </dialog>
 
   <dialog class="settings-dialog" id="settingsDialog">
-    <form method="dialog"><div class="dialog-head"><div><p class="eyebrow">⚙️ MY KITCHEN</p><h2>Planning preferences</h2></div><button class="icon-button" value="cancel">×</button></div><div class="dialog-body"><div class="account-card"><span>🏠</span><div><small>SHARED HOUSEHOLD</small><strong id="householdName">My kitchen</strong><code id="householdCode"></code></div></div><label>Shopping region<select id="regionSelect"><option value="Sweden">Sweden</option><option value="United States">United States</option><option value="United Kingdom">United Kingdom</option><option value="Kenya">Kenya</option><option value="Nigeria">Nigeria</option><option value="India">India</option><option value="Other">Other</option></select></label><label>Measurement system<select id="unitSelect"><option value="metric">Metric (g, kg, ml)</option><option value="imperial">Imperial (oz, lb, cups)</option></select></label><p class="settings-note">Share the household invite code with your wife so both accounts see the same latest plan.</p></div><div class="dialog-actions"><button type="button" class="secondary-button" id="logoutButton">Log out</button><span></span><button value="default" class="primary-button" id="saveSettings">Save preferences</button></div></form>
+    <form method="dialog"><div class="dialog-head"><div><p class="eyebrow">⚙️ MY KITCHEN</p><h2>Planning preferences</h2></div><button class="icon-button" value="cancel">×</button></div><div class="dialog-body"><div class="account-card"><span>🏠</span><div><small>SHARED HOUSEHOLD</small><strong id="householdName">My kitchen</strong><code id="accountRole"></code></div></div><label>Shopping region<select id="regionSelect"><option value="Sweden">Sweden</option><option value="United States">United States</option><option value="United Kingdom">United Kingdom</option><option value="Kenya">Kenya</option><option value="Nigeria">Nigeria</option><option value="India">India</option><option value="Other">Other</option></select></label><label>Measurement system<select id="unitSelect"><option value="metric">Metric (g, kg, ml)</option><option value="imperial">Imperial (oz, lb, cups)</option></select></label><button type="button" class="settings-action" id="changePasswordButton"><span>🔐</span><span><strong>Change my password</strong><small>Update your private login password</small></span></button><section class="admin-panel hidden" id="adminPanel"><div><p class="eyebrow">ADMIN ONLY</p><h3>Kitchen users</h3></div><div id="userList"></div><button type="button" class="primary-button full-width" id="openCreateUser">＋ Create user</button></section></div><div class="dialog-actions"><button type="button" class="secondary-button" id="logoutButton">Log out</button><span></span><button value="default" class="primary-button" id="saveSettings">Save preferences</button></div></form>
   </dialog>
 
   <dialog class="auth-dialog" id="authDialog">
     <div class="auth-art"><span>🥕</span><span>🍋</span><span>🥦</span><h2>Plan together.<br>Eat happy.</h2><p>Your shared family meal planner.</p></div>
     <form id="authForm">
       <p class="eyebrow">WELCOME TO LINCY</p><h2 id="authTitle">Log in to your kitchen</h2>
-      <div class="auth-tabs"><button type="button" class="active" data-auth-mode="login">Log in</button><button type="button" data-auth-mode="register">Create account</button></div>
-      <label>Name<input id="authName" autocomplete="name" placeholder="Your name"></label>
-      <label>Email<input id="authEmail" type="email" autocomplete="email" required placeholder="you@example.com"></label>
+      <div class="auth-tabs"><button type="button" class="active" data-auth-mode="login">Log in</button><button type="button" data-auth-mode="activate">Set first password</button></div>
+      <label>Username<input id="authUsername" autocomplete="username" required placeholder="e.g. rony"></label>
+      <label class="hidden" id="setupCodeLabel">One-time setup code<input id="authSetupCode" autocomplete="one-time-code" placeholder="Provided by your admin"></label>
       <label>Password<input id="authPassword" type="password" autocomplete="current-password" minlength="8" required placeholder="At least 8 characters"></label>
-      <div id="householdFields"><label>Kitchen name<input id="authHousehold" placeholder="The Johnson kitchen"></label><div class="auth-divider"><span>or</span></div><label>Join with invite code<input id="authInvite" maxlength="8" placeholder="AB12CD34"></label></div>
       <p class="auth-error" id="authError"></p><button class="primary-button full-width" type="submit" id="authSubmit">Log in</button>
-      <small class="auth-note">Create the first account, then share its invite code with your partner.</small>
+      <small class="auth-note">Only Rony or another admin can create kitchen users.</small>
     </form>
+  </dialog>
+
+  <dialog class="settings-dialog" id="createUserDialog">
+    <form id="createUserForm"><div class="dialog-head"><div><p class="eyebrow">ADMIN ONLY</p><h2>Create kitchen user</h2></div><button type="button" class="icon-button" id="closeCreateUser">×</button></div><div class="dialog-body"><label>Display name<input id="newUserName" required placeholder="e.g. Maria"></label><label>Username<input id="newUserUsername" required minlength="3" maxlength="30" placeholder="e.g. maria"></label><p class="settings-note">Lincy will generate a one-time setup code. Give the username and code to the user so they can choose their own password.</p><div class="setup-result hidden" id="setupResult"><small>ACCOUNT CREATED</small><strong id="createdUsername"></strong><code id="createdSetupCode"></code><p>Share both values now. The setup code is shown only once.</p></div><p class="auth-error" id="createUserError"></p></div><div class="dialog-actions"><span></span><button type="button" class="secondary-button" id="cancelCreateUser">Cancel</button><button type="submit" class="primary-button" id="createUserSubmit">Create user</button></div></form>
+  </dialog>
+
+  <dialog class="settings-dialog" id="passwordDialog">
+    <form id="passwordForm"><div class="dialog-head"><div><p class="eyebrow">ACCOUNT SECURITY</p><h2>Change password</h2></div><button type="button" class="icon-button" id="closePasswordDialog">×</button></div><div class="dialog-body"><label>Current password<input id="currentPassword" type="password" autocomplete="current-password" required></label><label>New password<input id="newPassword" type="password" autocomplete="new-password" minlength="8" required></label><p class="auth-error" id="passwordError"></p></div><div class="dialog-actions"><span></span><button type="button" class="secondary-button" id="cancelPassword">Cancel</button><button type="submit" class="primary-button">Update password</button></div></form>
   </dialog>
 
   <dialog class="settings-dialog" id="shoppingItemDialog">
