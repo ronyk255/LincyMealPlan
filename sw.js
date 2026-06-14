@@ -1,5 +1,5 @@
-const CACHE = "lincy-v20";
-const ASSETS = ["./", "./index.html", "./styles.css?v=20", "./shopping.css?v=20", "./theme.css?v=20", "./app.js?v=20", "./manifest.webmanifest"];
+const CACHE = "lincy-v21";
+const ASSETS = ["./", "./index.html", "./styles.css?v=21", "./shopping.css?v=21", "./theme.css?v=21", "./app.js?v=21", "./manifest.webmanifest"];
 self.addEventListener("install", event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener("activate", event => event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key)))).then(()=>self.clients.claim())));
 self.addEventListener("fetch", event => {

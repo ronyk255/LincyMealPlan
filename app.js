@@ -6,10 +6,17 @@ const dateKey = date => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad
 const parseDate = value => { const [y,m,d] = value.split("-").map(Number); return new Date(y,m-1,d); };
 const addDays = (date, count) => { const next = new Date(date); next.setDate(next.getDate() + count); return next; };
 const startOfWeek = date => addDays(date, -((date.getDay() + 6) % 7));
-const weekPositionInMonth = weekStart => {
-  const reference=weekStart,monthStart=new Date(reference.getFullYear(),reference.getMonth(),1);
-  const gridStart=startOfWeek(monthStart),calendarDays=(Date.UTC(weekStart.getFullYear(),weekStart.getMonth(),weekStart.getDate())-Date.UTC(gridStart.getFullYear(),gridStart.getMonth(),gridStart.getDate()))/86400000;
-  return {reference,number:Math.floor(calendarDays/7)+1};
+const ordinal = value => {
+  const remainder=value%100;
+  if(remainder>=11&&remainder<=13)return `${value}th`;
+  return `${value}${value%10===1?"st":value%10===2?"nd":value%10===3?"rd":"th"}`;
+};
+const formatWeekHeading = weekStart => {
+  const weekEnd=addDays(weekStart,6),sameMonth=weekStart.getMonth()===weekEnd.getMonth()&&weekStart.getFullYear()===weekEnd.getFullYear(),sameYear=weekStart.getFullYear()===weekEnd.getFullYear();
+  const startMonth=weekStart.toLocaleDateString(undefined,{month:"long"}),endMonth=weekEnd.toLocaleDateString(undefined,{month:"long"});
+  if(sameMonth)return `Week ${startMonth} ${ordinal(weekStart.getDate())} – ${ordinal(weekEnd.getDate())} ${weekEnd.getFullYear()}`;
+  if(sameYear)return `Week ${startMonth} ${ordinal(weekStart.getDate())} – ${endMonth} ${ordinal(weekEnd.getDate())} ${weekEnd.getFullYear()}`;
+  return `Week ${startMonth} ${ordinal(weekStart.getDate())} ${weekStart.getFullYear()} – ${endMonth} ${ordinal(weekEnd.getDate())} ${weekEnd.getFullYear()}`;
 };
 const escapeHtml = value => String(value || "").replace(/[&<>'"]/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[char]));
 
@@ -148,7 +155,8 @@ let syncTimer = null;
 let staticMode = false;
 let editingUserId = null;
 let previewOnly = false;
-let apiBase = localStorage.getItem("lincy-api-url")?.replace(/\/$/,"") || "";
+const DEFAULT_API_URL = "https://lincy-meal-plan-api.ronyk212.workers.dev";
+let apiBase = localStorage.getItem("lincy-api-url")?.replace(/\/$/,"") || DEFAULT_API_URL;
 let authToken = localStorage.getItem("lincy-auth-token") || "";
 
 function apiFetch(path,options={}){
@@ -206,9 +214,8 @@ function mealVisual(name="",type="") {
 }
 
 function renderWeek() {
-  const position=weekPositionInMonth(currentWeek);
-  $("#weekRange").textContent=position.reference.toLocaleDateString(undefined,{month:"long",year:"numeric"});
-  $("#weekNumber").textContent=`Week ${position.number}`;
+  $("#weekRange").textContent=currentWeek.toLocaleDateString(undefined,{month:"long",year:"numeric"});
+  $("#weekNumber").textContent=formatWeekHeading(currentWeek);
   $("#weekGrid").innerHTML=Array.from({length:7},(_,i)=>{
     const date=addDays(currentWeek,i), key=dateKey(date);
     const slots=TYPES.map(type=>{
@@ -216,7 +223,7 @@ function renderWeek() {
       const visual=meal?mealVisual(meal.name,type):null;
       return `<div class="meal-slot ${meal?`filled meal-theme-${visual.theme}`:""}" data-type="${type}"><span class="slot-label">${type}</span>${meal?`<button class="meal-card" data-view-meal="${key}|${type}"><span class="meal-card-icon" aria-hidden="true">${visual.icon}</span><span class="meal-card-copy"><strong>${escapeHtml(meal.name)}</strong><small>${escapeHtml(meal.time||"")} · ${meal.servings||4} servings</small></span></button>`:`<button class="add-slot" data-add-date="${key}" data-add-type="${type}" aria-label="Add ${type}">＋</button>`}</div>`;
     }).join("");
-    return `<div class="day-column"><div class="day-header"><span class="day-sticker">${["☀️","🥪","🍲","🥗","🌮","🥞","🍝"][i]}</span><span class="day-number">Day ${i+1}</span></div>${slots}</div>`;
+    return `<div class="day-column"><div class="day-header"><span class="day-sticker">${["☀️","🥪","🍲","🥗","🌮","🥞","🍝"][i]}</span><span class="day-number">${["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"][i]}</span></div>${slots}</div>`;
   }).join("");
   renderSidebars();
 }
@@ -686,9 +693,9 @@ window.addEventListener("focus",()=>{if(account&&!syncTimer)loadAccount();});
 renderSettings(); renderWeek(); loadAccount();
 if("serviceWorker" in navigator){
   navigator.serviceWorker.addEventListener("controllerchange",()=>{
-    if(sessionStorage.getItem("lincy-worker-reloaded")==="20")return;
-    sessionStorage.setItem("lincy-worker-reloaded","20");
+    if(sessionStorage.getItem("lincy-worker-reloaded")==="21")return;
+    sessionStorage.setItem("lincy-worker-reloaded","21");
     window.location.reload();
   });
-  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=20",{updateViaCache:"none"}).then(registration=>registration.update()).catch(()=>{}));
+  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=21",{updateViaCache:"none"}).then(registration=>registration.update()).catch(()=>{}));
 }

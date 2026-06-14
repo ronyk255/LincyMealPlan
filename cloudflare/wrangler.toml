@@ -8,4 +8,4 @@ ALLOWED_ORIGINS = "https://ronyk255.github.io,http://localhost:8765"
 [[d1_databases]]
 binding = "DB"
 database_name = "lincy-meal-plan"
-database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+database_id = "90e3ad45-aa3f-4ffb-9664-4c6637a51f6d"

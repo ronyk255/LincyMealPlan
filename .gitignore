@@ -3,3 +3,4 @@ lincy.sqlite-shm
 lincy.sqlite-wal
 .wrangler
 .dev.vars*
+node_modules/

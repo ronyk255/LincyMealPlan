@@ -16,17 +16,13 @@ Without a connected API, GitHub Pages runs as a read-only preview. Connecting th
 
 The `cloudflare` folder contains a free Cloudflare Worker and D1 database backend. GitHub Pages continues to host the interface.
 
-1. Create a free Cloudflare account and install Wrangler with `npm install --save-dev wrangler`.
-2. Run `npx wrangler login`.
-3. Run `npx wrangler d1 create lincy-meal-plan`.
-4. Copy the returned database ID into `cloudflare/wrangler.toml`.
-5. Run `npx wrangler d1 execute lincy-meal-plan --remote --file cloudflare/schema.sql`.
-6. Run `npx wrangler secret put ADMIN_SETUP_CODE --config cloudflare/wrangler.toml` and enter a private one-time code for Rony.
-7. Run `npm run cloudflare:deploy`.
-8. On the GitHub Pages preview, paste the resulting `https://...workers.dev` address into **Cloudflare Worker URL** and select **Connect free login**.
-9. Select **Set first password**, use username `rony`, enter the private setup code, and choose the permanent admin password.
+The free backend is deployed at `https://lincy-meal-plan-api.ronyk212.workers.dev` and the GitHub Pages app connects to it automatically.
 
-The Worker URL and login session are remembered by that browser. No password or setup code is stored in GitHub.
+To finish Rony's account, open the GitHub Pages site, select **Set first password**, use username `rony`, enter the private one-time setup code, and choose the permanent admin password.
+
+For future backend changes, run `npm run cloudflare:deploy`. The D1 database configuration is stored in `cloudflare/wrangler.toml`; the private setup code remains an encrypted Cloudflare secret.
+
+The login session is remembered by the browser. No password or setup code is stored in GitHub.
 
 ## Features
 

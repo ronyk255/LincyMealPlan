@@ -3,7 +3,7 @@
 .brand-mark{background:linear-gradient(145deg,#ff836d,#ef5f72);box-shadow:0 8px 20px rgba(0,0,0,.18)}
 .season-card{background:linear-gradient(135deg,#3b7664,#477d58)}
 .day-number{font-size:18px}.day-sticker{display:block;font-size:21px;margin-bottom:3px}
-.week-number-banner{display:flex;align-items:center;justify-content:center;gap:10px;margin:0 0 14px;padding:10px 16px;border:1px solid #f0d392;border-radius:14px;background:linear-gradient(90deg,#fff4cf,#ffe7c2);color:var(--ink);white-space:nowrap}.week-number-banner span{font-size:9px;letter-spacing:1.4px;font-weight:700;color:var(--coral)}.week-number-banner strong{font:700 22px "Playfair Display"}
+.week-number-banner{display:flex;align-items:center;justify-content:center;margin:0 0 14px;padding:10px 16px;border:1px solid #f0d392;border-radius:14px;background:linear-gradient(90deg,#fff4cf,#ffe7c2);color:var(--ink);white-space:nowrap}.week-number-banner strong{font:700 22px "Playfair Display"}
 .meal-slot.filled{box-shadow:0 5px 15px rgba(68,72,44,.07)}
 .month-weekdays,.month-grid{grid-template-columns:70px repeat(7,1fr)}
 .month-day:nth-child(7n){border-right:1px solid var(--line)}.month-day:nth-child(8n){border-right:0}

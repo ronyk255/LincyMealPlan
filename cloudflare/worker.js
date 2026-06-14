@@ -3,7 +3,7 @@ const emptyPlan=()=>({meals:{},settings:{region:"Sweden",units:"metric"},checked
 const bytesToHex=bytes=>[...new Uint8Array(bytes)].map(value=>value.toString(16).padStart(2,"0")).join("");
 const randomHex=size=>{const bytes=new Uint8Array(size);crypto.getRandomValues(bytes);return bytesToHex(bytes);};
 const sha256=async value=>bytesToHex(await crypto.subtle.digest("SHA-256",encoder.encode(value)));
-async function passwordHash(password,salt){const key=await crypto.subtle.importKey("raw",encoder.encode(password),"PBKDF2",false,["deriveBits"]);return bytesToHex(await crypto.subtle.deriveBits({name:"PBKDF2",hash:"SHA-256",salt:encoder.encode(salt),iterations:120000},key,256));}
+async function passwordHash(password,salt){const key=await crypto.subtle.importKey("raw",encoder.encode(password),"PBKDF2",false,["deriveBits"]);return bytesToHex(await crypto.subtle.deriveBits({name:"PBKDF2",hash:"SHA-256",salt:encoder.encode(salt),iterations:100000},key,256));}
 const validUsername=value=>/^[a-z0-9._-]{3,30}$/.test(value);
 
 function corsHeaders(request,env){
@@ -16,9 +16,10 @@ async function readBody(request){try{return await request.json();}catch{return {
 async function ensureAdmin(env){
   const existing=await env.DB.prepare("SELECT id FROM users LIMIT 1").first();if(existing)return;
   if(!env.ADMIN_SETUP_CODE)throw new Error("ADMIN_SETUP_CODE secret is missing");
-  const now=new Date().toISOString(),household=await env.DB.prepare("INSERT INTO households(name,plan,updated_at) VALUES(?,?,?)").bind("Rony's kitchen",JSON.stringify(emptyPlan()),now).run();
+  let household=await env.DB.prepare("SELECT id FROM households ORDER BY id LIMIT 1").first();
+  if(!household){const now=new Date().toISOString();await env.DB.prepare("INSERT INTO households(name,plan,updated_at) VALUES(?,?,?)").bind("Rony's kitchen",JSON.stringify(emptyPlan()),now).run();household=await env.DB.prepare("SELECT id FROM households ORDER BY id LIMIT 1").first();}
   const salt=randomHex(16),dummy=await passwordHash(randomHex(32),salt),setup=await sha256(env.ADMIN_SETUP_CODE.trim().toUpperCase());
-  await env.DB.prepare("INSERT INTO users(household_id,name,username,password_hash,salt,is_admin,setup_token_hash) VALUES(?,?,?,?,?,1,?)").bind(household.meta.last_row_id,"Rony","rony",dummy,salt,setup).run();
+  await env.DB.prepare("INSERT INTO users(household_id,name,username,password_hash,salt,is_admin,setup_token_hash) VALUES(?,?,?,?,?,1,?)").bind(household.id,"Rony","rony",dummy,salt,setup).run();
 }
 async function currentUser(request,env){
   const token=request.headers.get("Authorization")?.match(/^Bearer (.+)$/)?.[1];if(!token)return null;
