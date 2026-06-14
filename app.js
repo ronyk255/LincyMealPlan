@@ -646,4 +646,11 @@ $("#passwordForm").addEventListener("submit",async event=>{
 $("#logoutButton").onclick=async()=>{if(staticMode){$("#settingsDialog").close();showToast("Accounts are available on the hosted server version");return;}await fetch("/api/logout",{method:"POST"});account=null;$("#settingsDialog").close();setAuthMode("login");$("#authDialog").showModal();};
 window.addEventListener("focus",()=>{if(account&&!syncTimer)loadAccount();});
 renderSettings(); renderWeek(); loadAccount();
-if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js",{updateViaCache:"none"}).then(registration=>registration.update()).catch(()=>{}));
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.addEventListener("controllerchange",()=>{
+    if(sessionStorage.getItem("lincy-worker-reloaded")==="17")return;
+    sessionStorage.setItem("lincy-worker-reloaded","17");
+    window.location.reload();
+  });
+  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=17",{updateViaCache:"none"}).then(registration=>registration.update()).catch(()=>{}));
+}
