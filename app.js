@@ -580,16 +580,16 @@ function setAuthMode(mode){
 }
 function showLogin(){
   if(previewOnly){
-    $("#authTitle").textContent="This link is a preview";
-    $("#authError").textContent="Login is unavailable on GitHub Pages because it cannot run the account database. Open the hosted server URL to log in as Rony.";
+    $("#authTitle").textContent="Admin login is not deployed";
+    $("#authError").textContent="This GitHub Pages link is preview-only. There is no admin password yet. Deploy the secure server, set LINCY_ADMIN_SETUP_CODE, then sign in as rony using Set first password.";
   }else setAuthMode("login");
   if(!$("#authDialog").open)$("#authDialog").showModal();
 }
 function enterPreviewMode(){
   staticMode=true;previewOnly=true;document.body.classList.add("preview-only");
   $("#profileName").textContent="Preview mode";$("#profileRegion").textContent="Read-only · login server required";
-  $("#authTitle").textContent="This link is a preview";$("#authError").textContent="Login is unavailable on GitHub Pages because it cannot run the account database. Open the hosted server URL to log in as Rony.";
-  $("#authSubmit").classList.add("hidden");$("#previewContinue").classList.remove("hidden");
+  $("#authTitle").textContent="Admin login is not deployed";$("#authError").textContent="This GitHub Pages link is preview-only. There is no admin password yet. Deploy the secure server, set LINCY_ADMIN_SETUP_CODE, then sign in as rony using Set first password.";
+  $("#authForm").classList.add("static-preview-auth");$("#authSubmit").classList.add("hidden");$("#deployLogin").classList.remove("hidden");$("#previewContinue").classList.remove("hidden");
   [$("#authUsername"),$("#authPassword")].forEach(input=>input.disabled=true);
   $$('[data-auth-mode]').forEach(button=>button.disabled=true);
   if(!$("#authDialog").open)$("#authDialog").showModal();
@@ -669,9 +669,9 @@ window.addEventListener("focus",()=>{if(account&&!syncTimer)loadAccount();});
 renderSettings(); renderWeek(); loadAccount();
 if("serviceWorker" in navigator){
   navigator.serviceWorker.addEventListener("controllerchange",()=>{
-    if(sessionStorage.getItem("lincy-worker-reloaded")==="18")return;
-    sessionStorage.setItem("lincy-worker-reloaded","18");
+    if(sessionStorage.getItem("lincy-worker-reloaded")==="19")return;
+    sessionStorage.setItem("lincy-worker-reloaded","19");
     window.location.reload();
   });
-  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=18",{updateViaCache:"none"}).then(registration=>registration.update()).catch(()=>{}));
+  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=19",{updateViaCache:"none"}).then(registration=>registration.update()).catch(()=>{}));
 }
