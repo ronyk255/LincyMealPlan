@@ -148,6 +148,13 @@ let syncTimer = null;
 let staticMode = false;
 let editingUserId = null;
 let previewOnly = false;
+let apiBase = localStorage.getItem("lincy-api-url")?.replace(/\/$/,"") || "";
+let authToken = localStorage.getItem("lincy-auth-token") || "";
+
+function apiFetch(path,options={}){
+  const headers=new Headers(options.headers||{});if(authToken)headers.set("Authorization",`Bearer ${authToken}`);
+  return fetch(`${apiBase}${path}`,{...options,headers,credentials:apiBase?"omit":"same-origin"});
+}
 
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
@@ -157,7 +164,7 @@ const save = () => {
   clearTimeout(syncTimer);
   syncTimer=setTimeout(async()=>{
     try{
-      const response=await fetch("/api/plan",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({state})});
+      const response=await apiFetch("/api/plan",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({state})});
       if(!response.ok)throw new Error();
     }catch{showToast("Saved on this device; shared sync is offline");}
     finally{syncTimer=null;}
@@ -580,19 +587,24 @@ function setAuthMode(mode){
 }
 function showLogin(){
   if(previewOnly){
-    $("#authTitle").textContent="Admin login is not deployed";
-    $("#authError").textContent="This GitHub Pages link is preview-only. There is no admin password yet. Deploy the secure server, set LINCY_ADMIN_SETUP_CODE, then sign in as rony using Set first password.";
+    $("#authTitle").textContent="Connect free login";
+    $("#authError").textContent="Connect the free Cloudflare Worker API to enable Rony's login and shared household data.";
   }else setAuthMode("login");
   if(!$("#authDialog").open)$("#authDialog").showModal();
 }
 function enterPreviewMode(){
   staticMode=true;previewOnly=true;document.body.classList.add("preview-only");
   $("#profileName").textContent="Preview mode";$("#profileRegion").textContent="Read-only · login server required";
-  $("#authTitle").textContent="Admin login is not deployed";$("#authError").textContent="This GitHub Pages link is preview-only. There is no admin password yet. Deploy the secure server, set LINCY_ADMIN_SETUP_CODE, then sign in as rony using Set first password.";
-  $("#authForm").classList.add("static-preview-auth");$("#authSubmit").classList.add("hidden");$("#deployLogin").classList.remove("hidden");$("#previewContinue").classList.remove("hidden");
+  $("#authTitle").textContent="Connect free login";$("#authError").textContent="GitHub Pages stays free and hosts this preview. Connect the free Cloudflare Worker API once to enable Rony's login and shared household data.";
+  $("#authForm").classList.add("static-preview-auth");$("#authSubmit").classList.add("hidden");$("#freeLoginSetup").classList.remove("hidden");$("#deployLogin").classList.remove("hidden");$("#previewContinue").classList.remove("hidden");
   [$("#authUsername"),$("#authPassword")].forEach(input=>input.disabled=true);
   $$('[data-auth-mode]').forEach(button=>button.disabled=true);
   if(!$("#authDialog").open)$("#authDialog").showModal();
+}
+function leavePreviewMode(){
+  staticMode=false;previewOnly=false;document.body.classList.remove("preview-only");$("#authForm").classList.remove("static-preview-auth");
+  $("#freeLoginSetup").classList.add("hidden");$("#deployLogin").classList.add("hidden");$("#previewContinue").classList.add("hidden");$("#authSubmit").classList.remove("hidden");
+  [$("#authUsername"),$("#authPassword")].forEach(input=>input.disabled=false);$$('[data-auth-mode]').forEach(button=>button.disabled=false);setAuthMode("login");
 }
 function renderAccount(){
   if(!account)return;
@@ -605,13 +617,13 @@ function renderAccount(){
 async function loadUsers(){
   if(!account?.user.isAdmin)return;
   try{
-    const response=await fetch("/api/users",{cache:"no-store"}),data=await response.json();if(!response.ok)throw new Error(data.error);
+    const response=await apiFetch("/api/users",{cache:"no-store"}),data=await response.json();if(!response.ok)throw new Error(data.error);
     $("#userList").innerHTML=data.users.map(user=>`<div class="user-row"><span class="user-avatar">${escapeHtml(user.name.slice(0,1).toUpperCase())}</span><span><strong>${escapeHtml(user.name)}</strong><small>@${escapeHtml(user.username)}${user.pending?" · Password not set":""}</small></span>${user.isAdmin?"<b>Admin</b>":`<button type="button" class="user-edit" data-edit-user="${user.id}" data-user-name="${escapeHtml(user.name)}" data-username="${escapeHtml(user.username)}">Edit</button>`}</div>`).join("");
   }catch(error){showToast(error.message||"Could not load users");}
 }
 async function loadAccount(){
   try{
-    const response=await fetch("/api/plan",{cache:"no-store"});
+    const response=await apiFetch("/api/plan",{cache:"no-store"});
     if(response.status===404){
       enterPreviewMode();
       return;
@@ -628,12 +640,17 @@ $("#authForm").addEventListener("submit",async event=>{
   event.preventDefault();$("#authError").textContent="";$("#authSubmit").disabled=true;
   const payload={username:$("#authUsername").value.trim(),setupCode:$("#authSetupCode").value.trim(),password:$("#authPassword").value};
   try{
-    const response=await fetch(`/api/${authMode}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)}),data=await response.json();
-    if(!response.ok)throw new Error(data.error);await loadAccount();showToast(authMode==="activate"?"Password set. Welcome to the kitchen":"Welcome back");
+    const response=await apiFetch(`/api/${authMode}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)}),data=await response.json();
+    if(!response.ok)throw new Error(data.error);if(data.token){authToken=data.token;localStorage.setItem("lincy-auth-token",authToken);}await loadAccount();showToast(authMode==="activate"?"Password set. Welcome to the kitchen":"Welcome back");
   }catch(error){$("#authError").textContent=error.message||"Could not connect to the kitchen database.";}finally{$("#authSubmit").disabled=false;}
 });
 $("#authDialog").addEventListener("cancel",event=>event.preventDefault());
 $("#previewContinue").onclick=()=>{$("#authDialog").close();};
+$("#connectCloudflare").onclick=async()=>{
+  const value=$("#cloudflareApiUrl").value.trim().replace(/\/$/,"");if(!/^https:\/\//.test(value)){$("#authError").textContent="Enter the HTTPS workers.dev URL from Cloudflare.";return;}
+  $("#connectCloudflare").disabled=true;
+  try{const response=await fetch(`${value}/api/health`,{cache:"no-store"});if(!response.ok)throw new Error();apiBase=value;localStorage.setItem("lincy-api-url",apiBase);leavePreviewMode();await loadAccount();}catch{$("#authError").textContent="That Worker URL did not respond as a Lincy login API. Check the URL and deployment.";}finally{$("#connectCloudflare").disabled=false;}
+};
 document.addEventListener("click",event=>{
   if(!previewOnly)return;
   const blocked=event.target.closest("[data-add-date],[data-view-meal],[data-open-clear-plan],[data-clear-scope],[data-check],[data-edit-shopping],[data-delete-shopping],[data-add-shopping],#quickAddButton,#addShoppingItem,#profileButton,#saveSettings");
@@ -653,7 +670,7 @@ $("#closeCreateUser").onclick=closeCreateUser;$("#cancelCreateUser").onclick=clo
 $("#createUserForm").addEventListener("submit",async event=>{
   event.preventDefault();$("#createUserError").textContent="";$("#createUserSubmit").disabled=true;
   try{
-    const payload={name:$("#newUserName").value.trim(),username:$("#newUserUsername").value.trim()},response=await fetch(editingUserId?`/api/users/${editingUserId}`:"/api/users",{method:editingUserId?"PATCH":"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)}),data=await response.json();if(!response.ok)throw new Error(data.error);
+    const payload={name:$("#newUserName").value.trim(),username:$("#newUserUsername").value.trim()},response=await apiFetch(editingUserId?`/api/users/${editingUserId}`:"/api/users",{method:editingUserId?"PATCH":"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)}),data=await response.json();if(!response.ok)throw new Error(data.error);
     if(editingUserId){closeCreateUser();showToast(`User renamed to ${data.user.name}`);}else{$("#createdUsername").textContent=`Username: ${data.user.username}`;$("#createdSetupCode").textContent=`Setup code: ${data.setupCode}`;$("#setupResult").classList.remove("hidden");$("#createUserSubmit").classList.add("hidden");}loadUsers();
   }catch(error){$("#createUserError").textContent=error.message||"Could not create user.";}finally{$("#createUserSubmit").disabled=false;}
 });
@@ -662,16 +679,16 @@ $("#changePasswordButton").onclick=()=>{if(staticMode){showToast("Accounts are a
 $("#closePasswordDialog").onclick=closePasswordDialog;$("#cancelPassword").onclick=closePasswordDialog;
 $("#passwordForm").addEventListener("submit",async event=>{
   event.preventDefault();$("#passwordError").textContent="";
-  try{const response=await fetch("/api/change-password",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({currentPassword:$("#currentPassword").value,newPassword:$("#newPassword").value})}),data=await response.json();if(!response.ok)throw new Error(data.error);closePasswordDialog();showToast("Password updated");}catch(error){$("#passwordError").textContent=error.message||"Could not change password.";}
+  try{const response=await apiFetch("/api/change-password",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({currentPassword:$("#currentPassword").value,newPassword:$("#newPassword").value})}),data=await response.json();if(!response.ok)throw new Error(data.error);closePasswordDialog();showToast("Password updated");}catch(error){$("#passwordError").textContent=error.message||"Could not change password.";}
 });
-$("#logoutButton").onclick=async()=>{if(staticMode){$("#settingsDialog").close();showToast("Accounts are available on the hosted server version");return;}await fetch("/api/logout",{method:"POST"});account=null;$("#settingsDialog").close();setAuthMode("login");$("#authDialog").showModal();};
+$("#logoutButton").onclick=async()=>{await apiFetch("/api/logout",{method:"POST"}).catch(()=>{});authToken="";localStorage.removeItem("lincy-auth-token");account=null;$("#settingsDialog").close();setAuthMode("login");$("#authDialog").showModal();};
 window.addEventListener("focus",()=>{if(account&&!syncTimer)loadAccount();});
 renderSettings(); renderWeek(); loadAccount();
 if("serviceWorker" in navigator){
   navigator.serviceWorker.addEventListener("controllerchange",()=>{
-    if(sessionStorage.getItem("lincy-worker-reloaded")==="19")return;
-    sessionStorage.setItem("lincy-worker-reloaded","19");
+    if(sessionStorage.getItem("lincy-worker-reloaded")==="20")return;
+    sessionStorage.setItem("lincy-worker-reloaded","20");
     window.location.reload();
   });
-  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=19",{updateViaCache:"none"}).then(registration=>registration.update()).catch(()=>{}));
+  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=20",{updateViaCache:"none"}).then(registration=>registration.update()).catch(()=>{}));
 }

@@ -9,9 +9,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=19">
-  <link rel="stylesheet" href="shopping.css?v=19">
-  <link rel="stylesheet" href="theme.css?v=19">
+  <link rel="stylesheet" href="styles.css?v=20">
+  <link rel="stylesheet" href="shopping.css?v=20">
+  <link rel="stylesheet" href="theme.css?v=20">
   <link rel="manifest" href="manifest.webmanifest">
 </head>
 <body>
@@ -168,7 +168,8 @@
       <label class="hidden" id="setupCodeLabel">One-time setup code<input id="authSetupCode" autocomplete="one-time-code" placeholder="Provided by your admin"></label>
       <label>Password<input id="authPassword" type="password" autocomplete="current-password" minlength="8" required placeholder="At least 8 characters"></label>
       <p class="auth-error" id="authError"></p><button class="primary-button full-width" type="submit" id="authSubmit">Log in</button>
-      <a class="primary-button full-width deploy-login hidden" id="deployLogin" href="https://dashboard.render.com/blueprint/new?repo=https%3A%2F%2Fgithub.com%2Fronyk255%2FLincyMealPlan" target="_blank" rel="noopener">Deploy secure login</a>
+      <div class="free-login-setup hidden" id="freeLoginSetup"><label>Cloudflare Worker URL<input id="cloudflareApiUrl" type="url" placeholder="https://lincy-api.your-name.workers.dev"></label><button class="primary-button full-width" type="button" id="connectCloudflare">Connect free login</button></div>
+      <a class="secondary-button full-width deploy-login hidden" id="deployLogin" href="https://dash.cloudflare.com/" target="_blank" rel="noopener">Open free Cloudflare setup</a>
       <button class="secondary-button full-width hidden" type="button" id="previewContinue">View read-only preview</button>
       <small class="auth-note">Only Rony or another admin can create kitchen users.</small>
     </form>
@@ -206,6 +207,6 @@
   </dialog>
 
   <div class="toast" id="toast"></div>
-  <script src="app.js?v=19"></script>
+  <script src="app.js?v=20"></script>
 </body>
 </html>
