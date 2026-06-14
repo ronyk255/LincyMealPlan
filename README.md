@@ -12,6 +12,10 @@ Only an administrator can create or rename additional kitchen users. Each new ac
 
 The GitHub Pages deployment runs in static mode and saves plans in that browser. Shared accounts require the Node server because GitHub Pages cannot run server-side code or SQLite.
 
+## Publish with login
+
+The included `render.yaml` deploys the complete Node app with a persistent SQLite disk. In Render, create a new Blueprint from this GitHub repository and set `LINCY_ADMIN_SETUP_CODE` to a private one-time code for Rony. Open the resulting `onrender.com` URL instead of the GitHub Pages URL; it will show the login screen and keep shared household data.
+
 ## Features
 
 - Weekly plan with breakfast, lunch, dinner, and snack slots

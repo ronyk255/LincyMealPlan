@@ -35,6 +35,7 @@ function openSession(res,user){const token=crypto.randomBytes(32).toString("hex"
 function validUsername(value){return /^[a-z0-9._-]{3,30}$/.test(value);}
 
 async function api(req,res,url){
+  if(req.method==="GET"&&url.pathname==="/api/health")return json(res,200,{ok:true});
   if(req.method==="POST"&&url.pathname==="/api/login"){
     const data=await body(req),username=String(data.username||"").trim().toLowerCase(),user=db.prepare("SELECT * FROM users WHERE username=?").get(username);
     if(!user||user.setup_token_hash||hash(String(data.password||""),user.salt)!==user.password_hash)return json(res,401,{error:user?.setup_token_hash?"Set your password first using your one-time code.":"Username or password is incorrect."});
