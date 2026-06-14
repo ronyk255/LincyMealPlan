@@ -593,15 +593,19 @@ function setAuthMode(mode){
   $("#authError").textContent="";
 }
 function showLogin(){
-  if(previewOnly){
+  if(staticMode){
     $("#authTitle").textContent="Connect free login";
     $("#authError").textContent="Connect the free Cloudflare Worker API to enable Rony's login and shared household data.";
-  }else setAuthMode("login");
+  }else{leavePreviewMode();setAuthMode("login");}
   if(!$("#authDialog").open)$("#authDialog").showModal();
 }
+function startReadOnlyPreview(){
+  previewOnly=true;document.body.classList.add("preview-only");
+  $("#profileName").textContent="Preview mode";$("#profileRegion").textContent="Read-only preview";$("#previewLoginButton").classList.remove("hidden");
+  if($("#authDialog").open)$("#authDialog").close();
+}
 function enterPreviewMode(){
-  staticMode=true;previewOnly=true;document.body.classList.add("preview-only");
-  $("#profileName").textContent="Preview mode";$("#profileRegion").textContent="Read-only · login server required";
+  staticMode=true;startReadOnlyPreview();$("#profileRegion").textContent="Read-only · login server required";
   $("#authTitle").textContent="Connect free login";$("#authError").textContent="GitHub Pages stays free and hosts this preview. Connect the free Cloudflare Worker API once to enable Rony's login and shared household data.";
   $("#authForm").classList.add("static-preview-auth");$("#authSubmit").classList.add("hidden");$("#freeLoginSetup").classList.remove("hidden");$("#deployLogin").classList.remove("hidden");$("#previewContinue").classList.remove("hidden");
   [$("#authUsername"),$("#authPassword")].forEach(input=>input.disabled=true);
@@ -610,7 +614,7 @@ function enterPreviewMode(){
 }
 function leavePreviewMode(){
   staticMode=false;previewOnly=false;document.body.classList.remove("preview-only");$("#authForm").classList.remove("static-preview-auth");
-  $("#freeLoginSetup").classList.add("hidden");$("#deployLogin").classList.add("hidden");$("#previewContinue").classList.add("hidden");$("#authSubmit").classList.remove("hidden");
+  $("#freeLoginSetup").classList.add("hidden");$("#deployLogin").classList.add("hidden");$("#previewLoginButton").classList.add("hidden");$("#authSubmit").classList.remove("hidden");
   [$("#authUsername"),$("#authPassword")].forEach(input=>input.disabled=false);$$('[data-auth-mode]').forEach(button=>button.disabled=false);setAuthMode("login");
 }
 function renderAccount(){
@@ -636,7 +640,7 @@ async function loadAccount(){
       return;
     }
     if(!response.ok)throw new Error();
-    const data=await response.json();account={user:data.user,household:data.household};state=data.state;
+    const data=await response.json();leavePreviewMode();account={user:data.user,household:data.household};state=data.state;
     state.meals||={};state.settings||={region:"Sweden",units:"metric"};state.checked||={};state.shoppingOverrides||={};state.recipeChecks||={};
     localStorage.setItem(STORE_KEY,JSON.stringify(state));renderSettings();renderAccount();renderAll();
     if($("#authDialog").open)$("#authDialog").close();
@@ -652,7 +656,8 @@ $("#authForm").addEventListener("submit",async event=>{
   }catch(error){$("#authError").textContent=error.message||"Could not connect to the kitchen database.";}finally{$("#authSubmit").disabled=false;}
 });
 $("#authDialog").addEventListener("cancel",event=>event.preventDefault());
-$("#previewContinue").onclick=()=>{$("#authDialog").close();};
+$("#previewContinue").onclick=startReadOnlyPreview;
+$("#previewLoginButton").onclick=showLogin;
 $("#connectCloudflare").onclick=async()=>{
   const value=$("#cloudflareApiUrl").value.trim().replace(/\/$/,"");if(!/^https:\/\//.test(value)){$("#authError").textContent="Enter the HTTPS workers.dev URL from Cloudflare.";return;}
   $("#connectCloudflare").disabled=true;
@@ -660,7 +665,7 @@ $("#connectCloudflare").onclick=async()=>{
 };
 document.addEventListener("click",event=>{
   if(!previewOnly)return;
-  const blocked=event.target.closest("[data-add-date],[data-view-meal],[data-open-clear-plan],[data-clear-scope],[data-check],[data-edit-shopping],[data-delete-shopping],[data-add-shopping],#quickAddButton,#addShoppingItem,#profileButton,#saveSettings");
+  const blocked=event.target.closest("[data-add-date],[data-open-clear-plan],[data-clear-scope],[data-check],[data-step-check],[data-edit-shopping],[data-delete-shopping],[data-add-shopping],[data-edit-video],#quickAddButton,#addShoppingItem,#profileButton,#saveSettings,#editDetailMeal,#editDetailIngredients,#deleteMeal,#saveMeal");
   if(blocked){event.preventDefault();event.stopImmediatePropagation();showLogin();}
 },true);
 function closeCreateUser(){if($("#createUserDialog").open)$("#createUserDialog").close();}
@@ -693,9 +698,9 @@ window.addEventListener("focus",()=>{if(account&&!syncTimer)loadAccount();});
 renderSettings(); renderWeek(); loadAccount();
 if("serviceWorker" in navigator){
   navigator.serviceWorker.addEventListener("controllerchange",()=>{
-    if(sessionStorage.getItem("lincy-worker-reloaded")==="21")return;
-    sessionStorage.setItem("lincy-worker-reloaded","21");
+    if(sessionStorage.getItem("lincy-worker-reloaded")==="22")return;
+    sessionStorage.setItem("lincy-worker-reloaded","22");
     window.location.reload();
   });
-  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=21",{updateViaCache:"none"}).then(registration=>registration.update()).catch(()=>{}));
+  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=22",{updateViaCache:"none"}).then(registration=>registration.update()).catch(()=>{}));
 }

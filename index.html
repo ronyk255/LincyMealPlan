@@ -9,9 +9,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=21">
-  <link rel="stylesheet" href="shopping.css?v=21">
-  <link rel="stylesheet" href="theme.css?v=21">
+  <link rel="stylesheet" href="styles.css?v=22">
+  <link rel="stylesheet" href="shopping.css?v=22">
+  <link rel="stylesheet" href="theme.css?v=22">
   <link rel="manifest" href="manifest.webmanifest">
 </head>
 <body>
@@ -53,6 +53,7 @@
         <div class="top-actions">
           <a class="update-app-button" id="refreshAppButton" href="refresh.html" title="Clear cached files and load the latest version"><span aria-hidden="true">↻</span><b>Update app</b></a>
           <button class="today-button" id="todayButton" title="Open the current week"><span aria-hidden="true">●</span><b>Today</b></button>
+          <button class="today-button hidden" id="previewLoginButton"><span aria-hidden="true">🔐</span><b>Log in</b></button>
           <button class="primary-button" id="quickAddButton"><span>＋</span> Add meal</button>
         </div>
       </header>
@@ -170,7 +171,7 @@
       <p class="auth-error" id="authError"></p><button class="primary-button full-width" type="submit" id="authSubmit">Log in</button>
       <div class="free-login-setup hidden" id="freeLoginSetup"><label>Cloudflare Worker URL<input id="cloudflareApiUrl" type="url" placeholder="https://lincy-api.your-name.workers.dev"></label><button class="primary-button full-width" type="button" id="connectCloudflare">Connect free login</button></div>
       <a class="secondary-button full-width deploy-login hidden" id="deployLogin" href="https://dash.cloudflare.com/" target="_blank" rel="noopener">Open free Cloudflare setup</a>
-      <button class="secondary-button full-width hidden" type="button" id="previewContinue">View read-only preview</button>
+      <button class="secondary-button full-width" type="button" id="previewContinue">Preview site without editing</button>
       <small class="auth-note">Only Rony or another admin can create kitchen users.</small>
     </form>
   </dialog>
@@ -207,6 +208,6 @@
   </dialog>
 
   <div class="toast" id="toast"></div>
-  <script src="app.js?v=21"></script>
+  <script src="app.js?v=22"></script>
 </body>
 </html>
