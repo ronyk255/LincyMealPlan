@@ -5,6 +5,11 @@ const dateKey = date => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad
 const parseDate = value => { const [y,m,d] = value.split("-").map(Number); return new Date(y,m-1,d); };
 const addDays = (date, count) => { const next = new Date(date); next.setDate(next.getDate() + count); return next; };
 const startOfWeek = date => addDays(date, -((date.getDay() + 6) % 7));
+const weekPositionInMonth = weekStart => {
+  const reference=weekStart,monthStart=new Date(reference.getFullYear(),reference.getMonth(),1);
+  const gridStart=startOfWeek(monthStart),calendarDays=(Date.UTC(weekStart.getFullYear(),weekStart.getMonth(),weekStart.getDate())-Date.UTC(gridStart.getFullYear(),gridStart.getMonth(),gridStart.getDate()))/86400000;
+  return {reference,number:Math.floor(calendarDays/7)+1};
+};
 const escapeHtml = value => String(value || "").replace(/[&<>'"]/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[char]));
 
 const recipeLibrary = [
@@ -192,7 +197,9 @@ function mealVisual(name="",type="") {
 }
 
 function renderWeek() {
-  $("#weekRange").textContent=currentWeek.toLocaleDateString(undefined,{month:"long",year:"numeric"});
+  const position=weekPositionInMonth(currentWeek);
+  $("#weekRange").textContent=position.reference.toLocaleDateString(undefined,{month:"long",year:"numeric"});
+  $("#weekNumber").textContent=`Week ${position.number}`;
   $("#weekGrid").innerHTML=Array.from({length:7},(_,i)=>{
     const date=addDays(currentWeek,i), key=dateKey(date);
     const slots=TYPES.map(type=>{
